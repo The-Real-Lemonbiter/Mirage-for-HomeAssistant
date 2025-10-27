@@ -1,0 +1,11 @@
+{
+  "domain": "mirage",
+  "name": "Mirage UI",
+  "documentation": "https://github.com/Lemonbiter/mirage-ui",
+  "issue_tracker": "https://github.com/Lemonbiter/mirage-ui/issues",
+  "codeowners": ["@Lemonbiter"],
+  "version": "1.0.0",
+  "requirements": [],
+  "iot_class": "calculated",
+  "config_flow": true
+}

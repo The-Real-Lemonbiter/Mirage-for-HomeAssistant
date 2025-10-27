@@ -1,0 +1,6 @@
+{
+  "name": "Mirage UI",
+  "render_readme": true,
+  "domains": ["mirage"],
+  "iot_class": "calculated"
+}

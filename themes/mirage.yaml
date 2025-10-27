@@ -1,0 +1,144 @@
+#
+# Mirage Theme für Home Assistant
+#
+# ==============================================================================
+# WICHTIGER HINWEIS:
+# Diese Datei enthält nur die Standard-Stile für Mirage UI.
+# Der richtige Weg, um dein Theme anzupassen, ist über die Benutzeroberfläche
+# der "Mirage UI" Integration. Du findest sie unter:
+#   Einstellungen > Geräte & Dienste > Mirage UI > [Konfigurieren]
+#
+# Änderungen, die du dort machst, überschreiben die Werte in dieser Datei.
+# Bearbeite diese Datei nur, wenn die Integration nicht richtig funktioniert
+# oder du eine eigene Version entwickelst.
+# ==============================================================================
+#
+# Installation:
+# Das Theme wird automatisch von der Mirage UI Integration installiert. Du musst
+# nichts manuell machen. Wähle einfach "Mirage Dark" oder "Mirage Light" in
+# deinem Benutzerprofil aus, nachdem du die Integration eingerichtet hast.
+#
+
+Mirage Dark:
+  # Standard Home Assistant Theme Variables
+  primary-color: "#3b82f6"
+  accent-color: "var(--mirage-accent-color)" # Link to custom var
+  dark-primary-color: "#3b82f6"
+  light-primary-color: "#e5e7eb"
+
+  primary-text-color: "var(--mirage-primary-text-color)"
+  secondary-text-color: "var(--mirage-secondary-text-color)"
+  text-primary-color: "#ffffff"
+  disabled-text-color: "#6b7280"
+
+  primary-background-color: "#0d1117"
+  secondary-background-color: "#161b22"
+  card-background-color: "rgba(31, 41, 55, 0.5)" # Generic fallback
+  
+  sidebar-background-color: "#161b22"
+  sidebar-text-color: "var(--primary-text-color)"
+  sidebar-selected-text-color: "var(--text-primary-color)"
+  sidebar-selected-icon-color: "var(--primary-color)"
+  
+  state-icon-color: "#9ca3af"
+  state-icon-active-color: "var(--primary-color)"
+  
+  divider-color: "rgba(255, 255, 255, 0.1)"
+  
+  # ==========================================
+  # Custom Mirage CSS Variables (Defaults)
+  # ==========================================
+  mirage-accent-color: "#3b82f6"
+  mirage-temperature-color: "var(--mirage-accent-color)"
+  mirage-weather-color: "var(--mirage-accent-color)"
+  mirage-humidity-color: "var(--mirage-accent-color)"
+  mirage-door-color: "var(--mirage-accent-color)"
+  
+  mirage-primary-text-color: "#e5e7eb"
+  mirage-secondary-text-color: "#9ca3af"
+
+  mirage-border-radius: "16px"
+  mirage-border-width: "1px"
+  mirage-separator-width: "1px"
+
+  # Glass Style Specific
+  mirage-glass-blur: "20px"
+  mirage-glass-bg-color-dark: "rgba(86, 94, 88, 0.54)"
+  mirage-glass-border-color-dark: "rgba(255, 255, 255, 0.15)"
+  mirage-glass-shadow-dark: "0 8px 24px rgba(0,0,0,0.3)"
+
+  # Solid Style Specific
+  mirage-solid-bg-color-dark: "rgb(49, 49, 49)"
+  mirage-solid-border-color-dark: "rgba(255, 255, 255, 0.1)"
+  mirage-solid-shadow-dark: "0 2px 8px rgba(0,0,0,0.3)"
+  
+  # Paper Style Specific
+  mirage-paper-bg-color-dark: "rgb(42, 45, 53)"
+  mirage-paper-border-color-dark: "rgba(255, 255, 255, 0.1)"
+  mirage-paper-shadow-dark: "0 6px 16px rgba(0,0,0,0.5)"
+
+  # Floating Style Specific
+  mirage-floating-bg-color-dark: "rgb(42, 50, 61)"
+  mirage-floating-shadow-dark: "0 6px 20px rgba(0,0,0,0.3)"
+
+Mirage Light:
+  # Standard Home Assistant Theme Variables
+  primary-color: "#3b82f6"
+  accent-color: "var(--mirage-accent-color)" # Link to custom var
+  dark-primary-color: "#1f2937"
+  light-primary-color: "#3b82f6"
+
+  primary-text-color: "var(--mirage-primary-text-color)"
+  secondary-text-color: "var(--mirage-secondary-text-color)"
+  text-primary-color: "#000000"
+  disabled-text-color: "#9ca3af"
+  
+  primary-background-color: "#f3f4f6"
+  secondary-background-color: "#ffffff"
+  card-background-color: "rgba(255, 255, 255, 0.6)" # Generic fallback
+
+  sidebar-background-color: "#ffffff"
+  sidebar-text-color: "var(--secondary-text-color)"
+  sidebar-selected-text-color: "var(--primary-text-color)"
+  sidebar-selected-icon-color: "var(--primary-color)"
+
+  state-icon-color: "#6b7280"
+  state-icon-active-color: "var(--primary-color)"
+  
+  divider-color: "rgba(0, 0, 0, 0.1)"
+
+  # ==========================================
+  # Custom Mirage CSS Variables (Defaults)
+  # ==========================================
+  mirage-accent-color: "#3b82f6"
+  mirage-temperature-color: "var(--mirage-accent-color)"
+  mirage-weather-color: "var(--mirage-accent-color)"
+  mirage-humidity-color: "var(--mirage-accent-color)"
+  mirage-door-color: "var(--mirage-accent-color)"
+  
+  mirage-primary-text-color: "#1f2937"
+  mirage-secondary-text-color: "#4b5563"
+
+  mirage-border-radius: "16px"
+  mirage-border-width: "1px"
+  mirage-separator-width: "1px"
+
+  # Glass Style Specific
+  mirage-glass-blur: "20px"
+  mirage-glass-bg-color-light: "rgba(240, 242, 240, 0.6)"
+  mirage-glass-border-color-light: "rgba(0, 0, 0, 0.1)"
+  mirage-glass-shadow-light: "0 8px 24px rgba(0,0,0,0.1)"
+
+  # Solid Style Specific
+  mirage-solid-bg-color-light: "rgb(243, 243, 243)"
+  mirage-solid-border-color-light: "rgba(0, 0, 0, 0.08)"
+  mirage-solid-shadow-light: "0 2px 8px rgba(0,0,0,0.08)"
+  
+  # Paper Style Specific
+  mirage-paper-bg-color-light: "rgb(255, 255, 255)"
+  mirage-paper-border-color-light: "rgba(0, 0, 0, 0.08)"
+  mirage-paper-shadow-light: "0 4px 12px rgba(0,0,0,0.1)"
+
+  # Floating Style Specific
+  mirage-floating-bg-color-light: "rgb(255, 255, 255)"
+  mirage-floating-shadow-light: "0 6px 20px rgba(0,0,0,0.1)"
