@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2024 Lemonbiter
+ *
+ * This software is released under the MIT License.
+ * https://opensource.org/licenses/MIT
+ */
+
 import { LitElement, html, css } from "https://unpkg.com/lit-element@^3/lit-element.js?module";
 
 class MirageCardEditor extends LitElement {
