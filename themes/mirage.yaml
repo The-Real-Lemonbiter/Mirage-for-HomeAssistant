@@ -68,12 +68,12 @@ Mirage Dark:
   mirage-glass-shadow-dark: "0 8px 24px rgba(0,0,0,0.3)"
 
   # Solid Style Specific
-  mirage-solid-bg-color-dark: "rgb(49, 49, 49)"
+  mirage-solid-bg-color-dark: "#2d3748"
   mirage-solid-border-color-dark: "rgba(255, 255, 255, 0.1)"
   mirage-solid-shadow-dark: "0 2px 8px rgba(0,0,0,0.3)"
   
   # Paper Style Specific
-  mirage-paper-bg-color-dark: "rgb(42, 45, 53)"
+  mirage-paper-bg-color-dark: "#2a2d35"
   mirage-paper-border-color-dark: "rgba(255, 255, 255, 0.1)"
   mirage-paper-shadow-dark: "0 6px 16px rgba(0,0,0,0.5)"
 
@@ -130,12 +130,12 @@ Mirage Light:
   mirage-glass-shadow-light: "0 8px 24px rgba(0,0,0,0.1)"
 
   # Solid Style Specific
-  mirage-solid-bg-color-light: "rgb(243, 243, 243)"
+  mirage-solid-bg-color-light: "#e2e8f0"
   mirage-solid-border-color-light: "rgba(0, 0, 0, 0.08)"
   mirage-solid-shadow-light: "0 2px 8px rgba(0,0,0,0.08)"
   
   # Paper Style Specific
-  mirage-paper-bg-color-light: "rgb(255, 255, 255)"
+  mirage-paper-bg-color-light: "#ffffff"
   mirage-paper-border-color-light: "rgba(0, 0, 0, 0.08)"
   mirage-paper-shadow-light: "0 4px 12px rgba(0,0,0,0.1)"
 

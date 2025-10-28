@@ -372,12 +372,31 @@ export const SettingsPanel: React.FC<{ isOpen: boolean; onClose: () => void; }> 
                     )}
                     {settings.cardStyle === 'solid' && (
                          <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={ContrastIcon} label={t('grayness')}><input type="range" className={sliderClass} min="0" max="100" value={settings.solidGrayscale} onChange={(e) => settings.setSolidGrayscale(Number(e.target.value))} /><span className={sliderValueClass}>{settings.solidGrayscale}%</span></SettingRow>
+                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
+                              <input 
+                                type="color" 
+                                value={settings.theme === 'dark' ? settings.solidColorDark : settings.solidColorLight} 
+                                onChange={(e) => settings.theme === 'dark' ? settings.setSolidColorDark(e.target.value) : settings.setSolidColorLight(e.target.value)} 
+                                className="h-8 w-10 rounded-md"
+                              />
+                            </SettingRow>
+                        </div>
+                    )}
+                    {settings.cardStyle === 'paper' && (
+                         <div className="mt-2 bg-black/20 p-2 rounded-lg">
+                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
+                              <input 
+                                type="color" 
+                                value={settings.theme === 'dark' ? settings.paperColorDark : settings.paperColorLight} 
+                                onChange={(e) => settings.theme === 'dark' ? settings.setPaperColorDark(e.target.value) : settings.setPaperColorLight(e.target.value)} 
+                                className="h-8 w-10 rounded-md"
+                              />
+                            </SettingRow>
                         </div>
                     )}
                     {settings.cardStyle === 'floating' && (
                          <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={ColorPaletteIcon} label={t('backgroundColor')}><input type="color" value={settings.theme === 'dark' ? settings.floatingColorDark : settings.floatingColorLight} onChange={(e) => settings.theme === 'dark' ? settings.setFloatingColorDark(e.target.value) : settings.setFloatingColorLight(e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
+                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}><input type="color" value={settings.theme === 'dark' ? settings.floatingColorDark : settings.floatingColorLight} onChange={(e) => settings.theme === 'dark' ? settings.setFloatingColorDark(e.target.value) : settings.setFloatingColorLight(e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
                             <SettingRow icon={ContrastIcon} label={t('opacity')}><input type="range" className={sliderClass} min="0" max="100" value={settings.floatingOpacity} onChange={(e) => settings.setFloatingOpacity(Number(e.target.value))} /><span className={sliderValueClass}>{settings.floatingOpacity}%</span></SettingRow>
                         </div>
                     )}
@@ -417,10 +436,10 @@ export const SettingsPanel: React.FC<{ isOpen: boolean; onClose: () => void; }> 
                         <CustomColorInput label={t('door')} color={settings.doorColor} setColor={settings.setDoorColor} accentColor={settings.accentColor} />
                     </div>
 
-                    <SectionHeader title={t('backgrounds')}/>
+                    <SectionHeader title={t('pageBackground')}/>
                      <div className="bg-black/20 p-4 rounded-lg space-y-4">
-                        <BackgroundImageControl label={t('darkThemeBgImage')} customBg={settings.customBgDark} setCustomBg={settings.setCustomBgDark} t={t} />
-                        <SettingRow icon={ColorPaletteIcon} label={t('darkThemeBgColor')}>
+                        <BackgroundImageControl label={t('darkThemePageImage')} customBg={settings.customBgDark} setCustomBg={settings.setCustomBgDark} t={t} />
+                        <SettingRow icon={ColorPaletteIcon} label={t('darkThemePageColor')}>
                             <input 
                                 type="color" 
                                 value={settings.bgColorDark} 
@@ -429,8 +448,8 @@ export const SettingsPanel: React.FC<{ isOpen: boolean; onClose: () => void; }> 
                             />
                         </SettingRow>
                         <div className="border-t border-white/10 !my-2"></div>
-                        <BackgroundImageControl label={t('lightThemeBgImage')} customBg={settings.customBgLight} setCustomBg={settings.setCustomBgLight} t={t} />
-                        <SettingRow icon={ColorPaletteIcon} label={t('lightThemeBgColor')}>
+                        <BackgroundImageControl label={t('lightThemePageImage')} customBg={settings.customBgLight} setCustomBg={settings.setCustomBgLight} t={t} />
+                        <SettingRow icon={ColorPaletteIcon} label={t('lightThemePageColor')}>
                             <input
                                 type="color"
                                 value={settings.bgColorLight}

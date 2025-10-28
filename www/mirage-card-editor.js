@@ -65,20 +65,20 @@ class MirageCardEditor extends LitElement {
         const styleOptions = {
             'glass': [
                 { key: 'glass_blur', label: 'Blur Intensity', type: 'range', min: 0, max: 40, unit: 'px' },
-                { key: 'glass_bg_color_dark', label: 'BG Color (Dark)', type: 'color' },
-                { key: 'glass_bg_color_light', label: 'BG Color (Light)', type: 'color' },
+                { key: 'glass_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
+                { key: 'glass_bg_color_light', label: 'Card Background Color (Light)', type: 'color' },
             ],
             'solid': [
-                { key: 'solid_bg_color_dark', label: 'BG Color (Dark)', type: 'color' },
-                { key: 'solid_bg_color_light', label: 'BG Color (Light)', type: 'color' },
+                { key: 'solid_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
+                { key: 'solid_bg_color_light', label: 'Card Background Color (Light)', type: 'color' },
             ],
             'paper': [
-                 { key: 'paper_bg_color_dark', label: 'BG Color (Dark)', type: 'color' },
-                 { key: 'paper_bg_color_light', label: 'BG Color (Light)', type: 'color' },
+                 { key: 'paper_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
+                 { key: 'paper_bg_color_light', label: 'Card Background Color (Light)', type: 'color' },
             ],
             'floating': [
-                { key: 'floating_bg_color_dark', label: 'BG Color (Dark)', type: 'color' },
-                { key: 'floating_bg_color_light', label: 'BG Color (Light)', type: 'color' },
+                { key: 'floating_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
+                { key: 'floating_bg_color_light', label: 'Card Background Color (Light)', type: 'color' },
             ]
         };
 

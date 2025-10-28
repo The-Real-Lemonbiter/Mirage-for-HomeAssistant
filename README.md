@@ -16,6 +16,7 @@ Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwe
     2.  **Individuelles Karten-Styling**: Überschreibe das globale Theme für einzelne Karten, um bestimmte Geräte oder Bereiche hervorzuheben.
 - **Vier Karten-Stile**: Wähle zwischen `Glass`, `Solid`, `Paper` und `Floating`.
 - **Umfassende Anpassung**: Passe Farben, Ränder, Radien, Unschärfe und mehr über ein Live-Vorschau-Panel an.
+- **Dynamische Textfarben**: Text und Icons auf interaktiven Elementen (wie Quick Actions oder Szenen) passen sich automatisch an, um bei jeder Akzentfarbe lesbar zu bleiben.
 - **Visueller Editor**: Konfiguriere deine individuellen Karten direkt im Lovelace-Editor – ganz ohne YAML.
 - **Preset-System**: Speichere, lade und teile deine Designs mühelos.
 - **Import & Export**: Sichere deine Einstellungen oder teile sie mit der Community.
@@ -82,6 +83,7 @@ theme:
   card_style: paper # Überschreibt den globalen Stil
   accent_color: '#e11d48' # Rote Akzentfarbe, nur für diese Karte
   border_radius: 8
+  paper_bg_color_light: '#fef2f2' # Kachel-Hintergrundfarbe für hellen Modus
   card_primary_text_color: '#111827' # Dunkler Text für den Paper-Stil
 ```
 
@@ -112,6 +114,7 @@ This package is a single, unified **integration** that provides:
     2.  **Per-Card Styling**: Override the global theme for individual cards to highlight specific devices or sections.
 - **Four Card Styles**: Choose between `Glass`, `Solid`, `Paper`, and `Floating`.
 - **Deep Customization**: Adjust colors, borders, radius, blur, and more via a live-preview UI panel.
+- **Dynamic Text Colors**: Text and icons on interactive elements (like Quick Actions or Scenes) automatically adapt to remain readable against any chosen accent color.
 - **Visual Editor**: Configure your individual cards directly in the Lovelace editor—no YAML required.
 - **Preset System**: Save, load, and share your designs with ease.
 - **Import & Export**: Back up your settings or share them with the community.
@@ -178,6 +181,7 @@ theme:
   card_style: paper # Overrides the global style
   accent_color: '#e11d48' # Red accent, just for this card
   border_radius: 8
+  paper_bg_color_light: '#fef2f2' # Card background color for light mode
   card_primary_text_color: '#111827' # Dark text for paper style
 ```
 

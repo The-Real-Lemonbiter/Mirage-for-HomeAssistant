@@ -46,7 +46,8 @@ export interface MediaDevice {
 export interface Scene {
   id: string;
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
+  // Fix: The icon component type should include `style` to match its usage in `App.tsx`.
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
 }
 
 export interface DimmerLightDevice {
@@ -85,7 +86,10 @@ export interface SettingsState {
   cardStyle: CardStyle;
   transparency: number;
   blurIntensity: number;
-  solidGrayscale: number;
+  solidColorDark: string;
+  solidColorLight: string;
+  paperColorDark: string;
+  paperColorLight: string;
   floatingOpacity: number;
   floatingColorDark: string;
   floatingColorLight: string;
@@ -130,7 +134,10 @@ export interface SettingsContextType extends SettingsState {
   setCardStyle: (style: CardStyle) => void;
   setTransparency: (value: number) => void;
   setBlurIntensity: (value: number) => void;
-  setSolidGrayscale: (value: number) => void;
+  setSolidColorDark: (color: string) => void;
+  setSolidColorLight: (color: string) => void;
+  setPaperColorDark: (color: string) => void;
+  setPaperColorLight: (color: string) => void;
   setFloatingOpacity: (value: number) => void;
   setFloatingColorDark: (color: string) => void;
   setFloatingColorLight: (color: string) => void;

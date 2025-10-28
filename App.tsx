@@ -32,6 +32,18 @@ const hexToRgba = (hex: string, alpha: number): string => {
     return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 };
 
+const getContrastingTextColor = (hex: string): string => {
+    if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return '#f8fafc';
+    let c = hex.substring(1).split('');
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    const n = parseInt(`0x${c.join('')}`);
+    const r = (n >> 16) & 255;
+    const g = (n >> 8) & 255;
+    const b = n & 255;
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#0f172a' : '#f8fafc';
+};
+
 const Gauge: React.FC<{
   value: number;
   min?: number;
@@ -88,6 +100,8 @@ const Dashboard: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [activeScene, setActiveScene] = useState<string | null>('movie_time');
   const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
+  const [hoveredQuickAction, setHoveredQuickAction] = useState<string | null>(null);
+  const [hoveredScene, setHoveredScene] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setDateState(new Date()), 1000);
@@ -226,15 +240,39 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-around">
               {quickActions.map(action => {
                 const isActive = activeQuickAction === action.id;
+                const isHovered = hoveredQuickAction === action.id;
+                const isHighlighted = isActive || (isHovered && animationsEnabled);
+
                 const baseClasses = `flex flex-col items-center justify-center space-y-2 w-20 h-20 rounded-full transition-all duration-200 transform`;
                 const hoverClass = animationsEnabled ? 'hover:scale-105' : '';
-                const themeClasses = theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-black/5 hover:bg-black/10';
-                const activeStyle: React.CSSProperties = { backgroundColor: hexToRgba(accentColor, 0.3), transform: 'scale(1.05)' };
+                const themeClasses = theme === 'dark' ? 'bg-white/5' : 'bg-black/5';
+
+                const buttonStyle: React.CSSProperties = {};
+                const iconStyle: React.CSSProperties = {};
+                const textStyle: React.CSSProperties = { color: 'var(--mirage-card-secondary-text-color)' };
+                
+                if (isHighlighted) {
+                    buttonStyle.backgroundColor = hexToRgba(accentColor, theme === 'dark' ? 0.45 : 0.3);
+                    const contrastColor = getContrastingTextColor(accentColor);
+                    iconStyle.color = contrastColor;
+                    textStyle.color = contrastColor;
+                }
+                
+                if (isActive) {
+                    buttonStyle.transform = 'scale(1.05)';
+                }
                 
                 return (
-                  <button key={action.id} onClick={() => handleQuickAction(action.id)} className={`${baseClasses} ${themeClasses} ${hoverClass}`} style={isActive ? activeStyle : {}}>
-                    <action.icon className="w-8 h-8" style={isActive ? {color: accentColor} : {}}/>
-                    <span className="text-xs font-semibold" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{action.name}</span>
+                  <button 
+                    key={action.id} 
+                    onClick={() => handleQuickAction(action.id)} 
+                    onMouseEnter={() => setHoveredQuickAction(action.id)}
+                    onMouseLeave={() => setHoveredQuickAction(null)}
+                    className={`${baseClasses} ${!isHighlighted ? themeClasses : ''} ${hoverClass}`} 
+                    style={buttonStyle}
+                  >
+                    <action.icon className="w-8 h-8" style={iconStyle}/>
+                    <span className="text-xs font-semibold" style={textStyle}>{action.name}</span>
                   </button>
                 )
               })}
@@ -362,14 +400,29 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               {scenes.map(scene => {
                 const isActive = activeScene === scene.id;
-                const inactiveClasses = theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-black/5 hover:bg-black/10';
-                const baseStyle: React.CSSProperties = { borderRadius: `${borderRadius}px` };
-                const activeStyle: React.CSSProperties = { ...baseStyle, backgroundColor: hexToRgba(accentColor, theme === 'dark' ? 0.3 : 0.2) };
+                const isHovered = hoveredScene === scene.id;
+                const isHighlighted = isActive || (isHovered && animationsEnabled);
+                const inactiveClasses = theme === 'dark' ? 'bg-white/5' : 'bg-black/5';
+                
+                const buttonStyle: React.CSSProperties = { borderRadius: `${borderRadius}px` };
+                const contentStyle: React.CSSProperties = {};
+                
+                if (isHighlighted) {
+                    buttonStyle.backgroundColor = hexToRgba(accentColor, theme === 'dark' ? 0.45 : 0.3);
+                    contentStyle.color = getContrastingTextColor(accentColor);
+                }
 
                 return (
-                  <button key={scene.id} onClick={() => handleSceneActivation(scene.id)} className={`p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-colors ${isActive ? '' : inactiveClasses}`} style={isActive ? activeStyle : baseStyle}>
-                    <scene.icon className="w-8 h-8" />
-                    <span className="font-medium">{scene.name}</span>
+                  <button 
+                    key={scene.id} 
+                    onClick={() => handleSceneActivation(scene.id)} 
+                    onMouseEnter={() => setHoveredScene(scene.id)}
+                    onMouseLeave={() => setHoveredScene(null)}
+                    className={`p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-colors ${!isHighlighted ? inactiveClasses : ''}`} 
+                    style={buttonStyle}
+                  >
+                    <scene.icon className="w-8 h-8" style={contentStyle} />
+                    <span className="font-medium" style={contentStyle}>{scene.name}</span>
                   </button>
                 )
               })}

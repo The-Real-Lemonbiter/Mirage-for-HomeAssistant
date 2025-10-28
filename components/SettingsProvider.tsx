@@ -34,7 +34,10 @@ const DEFAULTS: SettingsState = {
     cardStyle: 'glass',
     transparency: 30,
     blurIntensity: 20,
-    solidGrayscale: 40,
+    solidColorDark: '#2d3748',
+    solidColorLight: '#e2e8f0',
+    paperColorDark: '#2a2d35',
+    paperColorLight: '#ffffff',
     floatingOpacity: 100,
     floatingColorDark: '#2a323d',
     floatingColorLight: '#ffffff',
@@ -97,7 +100,8 @@ const DEFAULT_PRESETS: Preset[] = [
     isDefault: true,
     settings: {
       cardStyle: 'solid',
-      solidGrayscale: 20,
+      solidColorDark: '#2d3748',
+      solidColorLight: '#e2e8f0',
       borderRadius: 8,
       borderThickness: 1,
       separatorThickness: 1,
@@ -115,15 +119,15 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "deletePreset": "Delete \"{presetName}\"", "saveCurrentStyle": "Save Current Style", "newPresetPlaceholder": "New preset name...",
       "save": "Save", "theme": "Theme", "mode": "Mode", "light": "Light", "dark": "Dark", "cardStyle": "Card Style",
       "glass": "Glass", "solid": "Solid", "paper": "Paper", "floating": "Floating", "blurIntensity": "Blur Intensity",
-      "transparency": "Transparency", "grayness": "Grayness", "backgroundColor": "Background Color", "opacity": "Opacity",
+      "transparency": "Transparency", "cardColor": "Card Background Color", "opacity": "Opacity",
       "appearance": "Appearance", "borderRadius": "Border Radius", "borderWidth": "Border Width", "separatorWidth": "Separator Width",
       "cardTextColor": "Card Text Color", "auto": "Auto", "fontStyle": "Font Style", "system": "System", "serif": "Serif",
       "mono": "Mono", "animations": "Animations", "colors": "Colors", "accentColor": "Accent Color",
-      "temperature": "Temperature", "weather": "Weather", "humidity": "Humidity", "door": "Door", "backgrounds": "Backgrounds",
-      "darkThemeBgImage": "Dark Theme Background Image", "darkThemeBgColor": "Dark Theme Background Color",
-      "lightThemeBgImage": "Light Theme Background Image", "lightThemeBgColor": "Light Theme Background Color",
+      "temperature": "Temperature", "weather": "Weather", "humidity": "Humidity", "door": "Door", "pageBackground": "Page Background",
+      "darkThemePageImage": "Dark Theme Page Image", "darkThemePageColor": "Dark Theme Page Color",
+      "lightThemePageImage": "Light Theme Page Image", "lightThemePageColor": "Light Theme Page Color",
       "uploadImage": "Upload Image", "localImageSelected": "Local Image Selected", "change": "Change", "clear": "Clear",
-      "bgNote": "Note: An uploaded image will always take precedence over a background color.", "advanced": "Advanced",
+      "bgNote": "Note: An uploaded image will always take precedence over a page background color.", "advanced": "Advanced",
       "export": "Export", "import": "Import", "settingsCopied": "Settings copied to clipboard!",
       "pasteSettingsPrompt": "Paste your Mirage UI settings string:", "importError": "Invalid settings format. Could not import.",
       "resetToDefaults": "Reset to Defaults", "language": "Language", "primary": "Primary", "secondary": "Secondary"
@@ -135,15 +139,15 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "deletePreset": "\"{presetName}\" löschen", "saveCurrentStyle": "Aktuellen Stil speichern", "newPresetPlaceholder": "Name für neues Preset...",
       "save": "Speichern", "theme": "Theme", "mode": "Modus", "light": "Hell", "dark": "Dunkel", "cardStyle": "Kartenstil",
       "glass": "Glas", "solid": "Solid", "paper": "Papier", "floating": "Schwebend", "blurIntensity": "Unschärfe",
-      "transparency": "Transparenz", "grayness": "Graustufe", "backgroundColor": "Hintergrundfarbe", "opacity": "Deckkraft",
+      "transparency": "Transparenz", "cardColor": "Kachel-Hintergrundfarbe", "opacity": "Deckkraft",
       "appearance": "Erscheinungsbild", "borderRadius": "Randradius", "borderWidth": "Randbreite", "separatorWidth": "Trennerbreite",
       "cardTextColor": "Karten-Textfarbe", "auto": "Auto", "fontStyle": "Schriftart", "system": "System", "serif": "Serif",
       "mono": "Mono", "animations": "Animationen", "colors": "Farben", "accentColor": "Akzentfarbe",
-      "temperature": "Temperatur", "weather": "Wetter", "humidity": "Feuchtigkeit", "door": "Tür", "backgrounds": "Hintergründe",
-      "darkThemeBgImage": "Hintergrundbild (Dunkel)", "darkThemeBgColor": "Hintergrundfarbe (Dunkel)",
-      "lightThemeBgImage": "Hintergrundbild (Hell)", "lightThemeBgColor": "Hintergrundfarbe (Hell)",
+      "temperature": "Temperatur", "weather": "Wetter", "humidity": "Feuchtigkeit", "door": "Tür", "pageBackground": "Seitenhintergrund",
+      "darkThemePageImage": "Seiten-Hintergrundbild (Dunkel)", "darkThemePageColor": "Seiten-Hintergrundfarbe (Dunkel)",
+      "lightThemePageImage": "Seiten-Hintergrundbild (Hell)", "lightThemePageColor": "Seiten-Hintergrundfarbe (Hell)",
       "uploadImage": "Bild hochladen", "localImageSelected": "Lokales Bild ausgewählt", "change": "Ändern", "clear": "Löschen",
-      "bgNote": "Hinweis: Ein hochgeladenes Bild hat immer Vorrang vor einer Hintergrundfarbe.", "advanced": "Erweitert",
+      "bgNote": "Hinweis: Ein hochgeladenes Bild hat immer Vorrang vor einer Seitenhintergrundfarbe.", "advanced": "Erweitert",
       "export": "Exportieren", "import": "Importieren", "settingsCopied": "Einstellungen in die Zwischenablage kopiert!",
       "pasteSettingsPrompt": "Fügen Sie Ihre Mirage UI Einstellungs-Zeichenfolge ein:", "importError": "Ungültiges Einstellungsformat. Import fehlgeschlagen.",
       "resetToDefaults": "Auf Standard zurücksetzen", "language": "Sprache", "primary": "Primär", "secondary": "Sekundär"
@@ -155,15 +159,15 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "deletePreset": "Supprimer \"{presetName}\"", "saveCurrentStyle": "Enregistrer le style actuel", "newPresetPlaceholder": "Nom du nouveau préréglage...",
       "save": "Enregistrer", "theme": "Thème", "mode": "Mode", "light": "Clair", "dark": "Sombre", "cardStyle": "Style de carte",
       "glass": "Verre", "solid": "Solide", "paper": "Papier", "floating": "Flottant", "blurIntensity": "Intensité du flou",
-      "transparency": "Transparence", "grayness": "Niveau de gris", "backgroundColor": "Couleur de fond", "opacity": "Opacité",
+      "transparency": "Transparence", "cardColor": "Couleur de fond de la carte", "opacity": "Opacité",
       "appearance": "Apparence", "borderRadius": "Rayon de la bordure", "borderWidth": "Largeur de la bordure", "separatorWidth": "Largeur du séparateur",
       "cardTextColor": "Couleur du texte de la carte", "auto": "Auto", "fontStyle": "Style de police", "system": "Système", "serif": "Serif",
       "mono": "Mono", "animations": "Animations", "colors": "Couleurs", "accentColor": "Couleur d'accentuation",
-      "temperature": "Température", "weather": "Météo", "humidity": "Humidité", "door": "Porte", "backgrounds": "Arrière-plans",
-      "darkThemeBgImage": "Image de fond (Thème sombre)", "darkThemeBgColor": "Couleur de fond (Thème sombre)",
-      "lightThemeBgImage": "Image de fond (Thème clair)", "lightThemeBgColor": "Couleur de fond (Thème clair)",
+      "temperature": "Température", "weather": "Météo", "humidity": "Humidité", "door": "Porte", "pageBackground": "Arrière-plan de la page",
+      "darkThemePageImage": "Image de fond de page (Thème sombre)", "darkThemePageColor": "Couleur de fond de page (Thème sombre)",
+      "lightThemePageImage": "Image de fond de page (Thème clair)", "lightThemePageColor": "Couleur de fond de page (Thème clair)",
       "uploadImage": "Télécharger une image", "localImageSelected": "Image locale sélectionnée", "change": "Changer", "clear": "Effacer",
-      "bgNote": "Remarque : Une image téléchargée prévaudra toujours sur une couleur de fond.", "advanced": "Avancé",
+      "bgNote": "Remarque : Une image téléchargée prévaudra toujours sur la couleur de fond de la page.", "advanced": "Avancé",
       "export": "Exporter", "import": "Importer", "settingsCopied": "Paramètres copiés dans le presse-papiers !",
       "pasteSettingsPrompt": "Collez votre chaîne de paramètres de l'interface Mirage :", "importError": "Format de paramètres non valide. L'importation a échoué.",
       "resetToDefaults": "Réinitialiser les paramètres par défaut", "language": "Langue", "primary": "Primaire", "secondary": "Secondaire"
@@ -176,7 +180,10 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [cardStyle, setCardStyle] = useState<CardStyle>(DEFAULTS.cardStyle);
     const [transparency, setTransparency] = useState<number>(DEFAULTS.transparency);
     const [blurIntensity, setBlurIntensity] = useState<number>(DEFAULTS.blurIntensity);
-    const [solidGrayscale, setSolidGrayscale] = useState<number>(DEFAULTS.solidGrayscale);
+    const [solidColorDark, setSolidColorDark] = useState<string>(DEFAULTS.solidColorDark);
+    const [solidColorLight, setSolidColorLight] = useState<string>(DEFAULTS.solidColorLight);
+    const [paperColorDark, setPaperColorDark] = useState<string>(DEFAULTS.paperColorDark);
+    const [paperColorLight, setPaperColorLight] = useState<string>(DEFAULTS.paperColorLight);
     const [floatingOpacity, setFloatingOpacity] = useState<number>(DEFAULTS.floatingOpacity);
     const [floatingColorDark, setFloatingColorDark] = useState<string>(DEFAULTS.floatingColorDark);
     const [floatingColorLight, setFloatingColorLight] = useState<string>(DEFAULTS.floatingColorLight);
@@ -225,7 +232,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const setters: Record<keyof SettingsState, Function> = {
       theme: setTheme, cardStyle: setCardStyle, transparency: setTransparency, blurIntensity: setBlurIntensity,
-      solidGrayscale: setSolidGrayscale, floatingOpacity: setFloatingOpacity, floatingColorDark: setFloatingColorDark,
+      solidColorDark: setSolidColorDark, solidColorLight: setSolidColorLight, paperColorDark: setPaperColorDark, paperColorLight: setPaperColorLight,
+      floatingOpacity: setFloatingOpacity, floatingColorDark: setFloatingColorDark,
       floatingColorLight: setFloatingColorLight, borderThickness: setBorderThickness, separatorThickness: setSeparatorThickness,
       borderRadius: setBorderRadius, accentColor: setAccentColor, temperatureColor: setTemperatureColor,
       weatherColor: setWeatherColor, humidityColor: setHumidityColor, doorColor: setDoorColor,
@@ -261,7 +269,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, [applyPreset]);
 
     const getCurrentSettings = (): SettingsState => ({
-      theme, cardStyle, transparency, blurIntensity, solidGrayscale, floatingOpacity, floatingColorDark, floatingColorLight,
+      theme, cardStyle, transparency, blurIntensity, solidColorDark, solidColorLight, paperColorDark, paperColorLight,
+      floatingOpacity, floatingColorDark, floatingColorLight,
       borderThickness, separatorThickness, borderRadius, accentColor, temperatureColor, weatherColor,
       humidityColor, doorColor, darkThemeTextColors, lightThemeTextColors, cardTextColorMode, bgColorDark, bgColorLight, 
       customBgDark, customBgLight, font, animationsEnabled, language
@@ -339,18 +348,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         root.style.setProperty('--mirage-glass-shadow-light', `0 8px 24px rgba(0,0,0,0.1)`);
         
         // Solid Style
-        const grayDark = Math.round(35 + (solidGrayscale / 100) * 35);
-        const grayLight = Math.round(235 + (solidGrayscale / 100) * 20);
-        root.style.setProperty('--mirage-solid-bg-color-dark', `rgb(${grayDark}, ${grayDark}, ${grayDark})`);
-        root.style.setProperty('--mirage-solid-bg-color-light', `rgb(${grayLight}, ${grayLight}, ${grayLight})`);
+        root.style.setProperty('--mirage-solid-bg-color-dark', solidColorDark);
+        root.style.setProperty('--mirage-solid-bg-color-light', solidColorLight);
         root.style.setProperty('--mirage-solid-border-color-dark', 'rgba(255, 255, 255, 0.1)');
         root.style.setProperty('--mirage-solid-border-color-light', 'rgba(0, 0, 0, 0.08)');
         root.style.setProperty('--mirage-solid-shadow-dark', `0 2px 8px rgba(0,0,0,0.3)`);
         root.style.setProperty('--mirage-solid-shadow-light', `0 2px 8px rgba(0,0,0,0.08)`);
         
         // Paper Style
-        root.style.setProperty('--mirage-paper-bg-color-dark', `rgb(42, 45, 53)`);
-        root.style.setProperty('--mirage-paper-bg-color-light', `rgb(255, 255, 255)`);
+        root.style.setProperty('--mirage-paper-bg-color-dark', paperColorDark);
+        root.style.setProperty('--mirage-paper-bg-color-light', paperColorLight);
         root.style.setProperty('--mirage-paper-border-color-dark', 'rgba(255, 255, 255, 0.1)');
         root.style.setProperty('--mirage-paper-border-color-light', 'rgba(0, 0, 0, 0.08)');
         root.style.setProperty('--mirage-paper-shadow-dark', `0 6px 16px rgba(0,0,0,0.5)`);
@@ -367,14 +374,16 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         root.style.setProperty('--mirage-slider-thumb-bg-color', hexToRgba(accentColor, 0.7));
 
     }, [
-        theme, cardStyle, transparency, blurIntensity, solidGrayscale, floatingOpacity, floatingColorDark, floatingColorLight,
-        borderThickness, separatorThickness, borderRadius, accentColor, temperatureColor, weatherColor,
-        humidityColor, doorColor, darkThemeTextColors, lightThemeTextColors, cardTextColorMode
+        theme, cardStyle, transparency, blurIntensity, solidColorDark, solidColorLight, paperColorDark, paperColorLight,
+        floatingOpacity, floatingColorDark, floatingColorLight, borderThickness, separatorThickness, borderRadius, 
+        accentColor, temperatureColor, weatherColor, humidityColor, doorColor, darkThemeTextColors, 
+        lightThemeTextColors, cardTextColorMode
     ]);
     
     const value: SettingsContextType = {
         theme, setTheme, cardStyle, setCardStyle, transparency, setTransparency, blurIntensity, setBlurIntensity,
-        solidGrayscale, setSolidGrayscale, floatingOpacity, setFloatingOpacity, floatingColorDark, setFloatingColorDark,
+        solidColorDark, setSolidColorDark, solidColorLight, setSolidColorLight, paperColorDark, setPaperColorDark, paperColorLight, setPaperColorLight,
+        floatingOpacity, setFloatingOpacity, floatingColorDark, setFloatingColorDark,
         floatingColorLight, setFloatingColorLight, borderThickness, setBorderThickness, separatorThickness, setSeparatorThickness,
         borderRadius, setBorderRadius, accentColor, setAccentColor, temperatureColor, setTemperatureColor, weatherColor, setWeatherColor,
         humidityColor, setHumidityColor, doorColor, setDoorColor, darkThemeTextColors, setDarkThemeTextColors,
