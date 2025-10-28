@@ -1,6 +1,6 @@
 # Mirage UI für Home Assistant
 
-Mirage UI ist eine elegante, moderne und umfassend konfigurierbare Benutzeroberfläche für Home Assistant. Inspiriert von Glassmorphism, bietet sie dir ein wunderschönes und intuitives Erlebnis zur Steuerung deines Smart Homes.
+Mirage UI ist eine elegante, moderne und umfassend konfigurierbare Benutzeroberfläche für Home Assistant. Es ist ein komplettes UI-System, das vier verschiedene Karten-Stile (`Glass`, `Solid`, `Paper` und `Floating`) bietet, um dir ein intuitives und personalisiertes Erlebnis zur Steuerung deines Smart Homes zu ermöglichen.
 
 Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwendige mitbringt:
 - Ein dynamisches **Mirage Theme** (im hellen und dunklen Modus).
@@ -98,7 +98,7 @@ Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
 # Mirage UI for Home Assistant (English)
 
-Mirage UI is a sleek, modern, and highly configurable user interface for Home Assistant. Inspired by glassmorphism, it provides a beautiful and intuitive experience for controlling your smart home.
+Mirage UI is a sleek, modern, and highly configurable user interface for Home Assistant. It's a complete UI system featuring four distinct card styles (`Glass`, `Solid`, `Paper`, and `Floating`) to provide an intuitive and personalized experience for controlling your smart home.
 
 This package is a single, unified **integration** that provides:
 - A dynamic **Mirage Theme** (in dark and light modes).

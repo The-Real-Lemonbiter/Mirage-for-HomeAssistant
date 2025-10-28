@@ -1,5 +1,5 @@
 {
   "name": "Mirage UI",
-  "description": "A sleek, glassmorphism-inspired smart home dashboard named Mirage. It provides a modern, intuitive interface for controlling smart devices, with deep customization including user-selectable card text color for perfect readability.",
+  "description": "A sleek, multi-style smart home dashboard named Mirage. It provides a modern, intuitive interface for controlling smart devices, with deep customization across four distinct card styles (Glass, Solid, Paper, Floating) and user-selectable card text color for perfect readability.",
   "requestFramePermissions": []
 }
