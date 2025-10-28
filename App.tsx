@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Lemonbiter
+ * Copyright (c) 2025 Lemonbiter
  *
  * This software is released under the MIT License.
  * https://opensource.org/licenses/MIT
@@ -379,7 +379,6 @@ const Dashboard: React.FC = () => {
             cardStyle={'paper'} 
             className="sm:col-span-1"
             styleOverrides={{
-// Fix: Corrected typo in CSS custom property key.
               '--mirage-accent-color': '#e11d48',
               '--mirage-card-primary-text-color': '#000000',
               '--mirage-card-secondary-text-color': '#4b5563',

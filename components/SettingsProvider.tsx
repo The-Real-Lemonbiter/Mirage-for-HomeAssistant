@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Lemonbiter
+ * Copyright (c) 2025 Lemonbiter
  *
  * This software is released under the MIT License.
  * https://opensource.org/licenses/MIT
