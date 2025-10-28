@@ -217,7 +217,7 @@ const PresetsManager: React.FC = () => {
     const settings = useSettings();
     const { presets, applyPreset, savePreset, deletePreset, t } = settings;
     
-    const [selectedPresetName, setSelectedPresetName] = useState<string>(presets[0]?.name || '');
+    const [selectedPresetKey, setSelectedPresetKey] = useState<string>(presets[0]?.key || '');
     const [newPresetName, setNewPresetName] = useState('');
     const [prePresetState, setPrePresetState] = useState<Partial<SettingsState> | null>(null);
 
@@ -225,8 +225,8 @@ const PresetsManager: React.FC = () => {
     const customPresets = useMemo(() => presets.filter(p => !p.isDefault), [presets]);
 
     const handlePresetSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const presetName = e.target.value;
-        const preset = presets.find(p => p.name === presetName);
+        const presetKey = e.target.value;
+        const preset = presets.find(p => p.key === presetKey);
 
         if (preset) {
             if (!prePresetState) {
@@ -241,15 +241,15 @@ const PresetsManager: React.FC = () => {
             }
             
             applyPreset(preset);
-            setSelectedPresetName(presetName);
+            setSelectedPresetKey(presetKey);
         }
     };
 
     const handleUndo = () => {
         if (prePresetState) {
-            applyPreset({ name: 'Reverted State', settings: prePresetState });
+            applyPreset({ key: 'reverted', name: 'Reverted State', settings: prePresetState });
             setPrePresetState(null);
-            setSelectedPresetName(presets[0]?.name || '');
+            setSelectedPresetKey(presets[0]?.key || '');
         }
     };
     
@@ -260,30 +260,32 @@ const PresetsManager: React.FC = () => {
         }
     };
     
+    const selectedCustomPreset = customPresets.find(p => p.key === selectedPresetKey);
+
     return (
         <div className="bg-black/20 p-4 rounded-lg space-y-4">
              <div className="space-y-2">
                  <label className="text-sm font-medium text-gray-300 block">{t('loadPreset')}</label>
                  <div className="flex items-center space-x-2">
                     <select
-                        value={selectedPresetName}
+                        value={selectedPresetKey}
                         onChange={handlePresetSelect}
                         className="w-full bg-gray-700 border-gray-600 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                     >
                         <optgroup label={t('defaultPresets')}>
-                            {defaultPresets.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+                            {defaultPresets.map(p => <option key={p.key} value={p.key}>{p.name}</option>)}
                         </optgroup>
                         {customPresets.length > 0 && <optgroup label={t('myPresets')}>
-                            {customPresets.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
+                            {customPresets.map(p => <option key={p.key} value={p.key}>{p.name}</option>)}
                         </optgroup>}
                     </select>
                     {prePresetState && (
-                         <button onClick={handleUndo} className="upload-btn !px-4 whitespace-nowrap" title="Revert to state before loading a preset">{t('undo')}</button>
+                         <button onClick={handleUndo} className="upload-btn !px-4 whitespace-nowrap" title={t('undoPresetLoadTooltip')}>{t('undo')}</button>
                     )}
                  </div>
-                 {customPresets.find(p => p.name === selectedPresetName) && (
-                     <button onClick={() => deletePreset(selectedPresetName)} className="text-xs text-red-400 hover:text-red-300 transition-colors w-full text-right pr-1">
-                       {t('deletePreset', { presetName: selectedPresetName })}
+                 {selectedCustomPreset && (
+                     <button onClick={() => deletePreset(selectedPresetKey)} className="text-xs text-red-400 hover:text-red-300 transition-colors w-full text-right pr-1">
+                       {t('deletePreset', { presetName: selectedCustomPreset.name })}
                      </button>
                  )}
             </div>

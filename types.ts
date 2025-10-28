@@ -29,7 +29,7 @@ export interface ThermostatDevice {
 }
 
 export interface SensorDevice {
-  id: string;
+  id:string;
   name: string;
   value: string;
   icon: 'door' | 'humidity' | 'temperature';
@@ -114,6 +114,7 @@ export interface SettingsState {
 }
 
 export interface Preset {
+  key: string;
   name: string;
   isDefault?: boolean;
   settings: Partial<SettingsState>;
@@ -170,7 +171,7 @@ export interface SettingsContextType extends SettingsState {
   presets: Preset[];
   applyPreset: (preset: Preset) => void;
   savePreset: (name: string) => void;
-  deletePreset: (name: string) => void;
+  deletePreset: (key: string) => void;
   
   // Import/Export
   exportSettings: () => string;

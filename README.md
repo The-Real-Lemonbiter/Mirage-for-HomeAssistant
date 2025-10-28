@@ -1,6 +1,6 @@
 # Mirage UI für Home Assistant
 
-Mirage UI ist eine elegante, moderne und umfassend konfigurierbare Benutzeroberfläche für Home Assistant. Es ist ein komplettes UI-System, das vier verschiedene Karten-Stile (`Glass`, `Solid`, `Paper` und `Floating`) bietet, um dir ein intuitives und personalisiertes Erlebnis zur Steuerung deines Smart Homes zu ermöglichen.
+Mirage UI ist eine elegante, moderne und umfassend konfigurierbare Benutzeroberfläche für Home Assistant. Es ist ein komplettes UI-System, das verschiedene Karten-Stile (`Glas`, `Deckend`, `Papier` und `Schwebend`) bietet, um dir ein intuitives und personalisiertes Erlebnis zur Steuerung deines Smart Homes zu ermöglichen.
 
 Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwendige mitbringt:
 - Ein dynamisches **Mirage Theme** (im hellen und dunklen Modus).
@@ -14,11 +14,11 @@ Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwe
 - **Zwei Styling-Modi**:
     1.  **Globales Theme**: Einmal einstellen, überall anwenden. Perfekt für ein einheitliches Design.
     2.  **Individuelles Karten-Styling**: Überschreibe das globale Theme für einzelne Karten, um bestimmte Geräte oder Bereiche hervorzuheben.
-- **Vier Karten-Stile**: Wähle zwischen `Glass`, `Solid`, `Paper` und `Floating`.
+- **Verschiedene Karten-Stile**: Wähle zwischen `Glas`, `Deckend`, `Papier` und `Schwebend`.
 - **Umfassende Anpassung**: Passe Farben, Ränder, Radien, Unschärfe und mehr über ein Live-Vorschau-Panel an.
 - **Dynamische Textfarben**: Text und Icons auf interaktiven Elementen (wie Quick Actions oder Szenen) passen sich automatisch an, um bei jeder Akzentfarbe lesbar zu bleiben.
 - **Visueller Editor**: Konfiguriere deine individuellen Karten direkt im Lovelace-Editor – ganz ohne YAML.
-- **Preset-System**: Speichere, lade und teile deine Designs mühelos.
+- **Vorgaben-System**: Speichere, lade und teile deine Designs mühelos.
 - **Import & Export**: Sichere deine Einstellungen oder teile sie mit der Community.
 - **Eigene Hintergründe**: Lade unterschiedliche Hintergrundbilder für dein helles und dunkles Theme hoch.
 - **Deaktivierbare Animationen**: Schalte alle UI-Animationen mit einem Klick aus. Dies entfernt Hover-Effekte (wie das Vergrößern von Buttons), kontinuierliche Animationen (wie das rotierende Ventilator-Icon) und sanfte Übergänge für ein statisches, reaktionsschnelles Interface.
@@ -98,7 +98,7 @@ Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
 # Mirage UI for Home Assistant (English)
 
-Mirage UI is a sleek, modern, and highly configurable user interface for Home Assistant. It's a complete UI system featuring four distinct card styles (`Glass`, `Solid`, `Paper`, and `Floating`) to provide an intuitive and personalized experience for controlling your smart home.
+Mirage UI is a sleek, modern, and highly configurable user interface for Home Assistant. It's a complete UI system featuring multiple distinct card styles (like `Glass`, `Solid`, `Paper`, and `Floating`) to provide an intuitive and personalized experience for controlling your smart home.
 
 This package is a single, unified **integration** that provides:
 - A dynamic **Mirage Theme** (in dark and light modes).
@@ -112,7 +112,7 @@ This package is a single, unified **integration** that provides:
 - **Two Styling Modes**:
     1.  **Global Theming**: Set it once, apply it everywhere. Perfect for a consistent design.
     2.  **Per-Card Styling**: Override the global theme for individual cards to highlight specific devices or sections.
-- **Four Card Styles**: Choose between `Glass`, `Solid`, `Paper`, and `Floating`.
+- **Multiple Card Styles**: Choose between styles like `Glass`, `Solid`, `Paper`, and `Floating`.
 - **Deep Customization**: Adjust colors, borders, radius, blur, and more via a live-preview UI panel.
 - **Dynamic Text Colors**: Text and icons on interactive elements (like Quick Actions or Scenes) automatically adapt to remain readable against any chosen accent color.
 - **Visual Editor**: Configure your individual cards directly in the Lovelace editor—no YAML required.
@@ -211,6 +211,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+LIABILITY, WHETHER IN A ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.

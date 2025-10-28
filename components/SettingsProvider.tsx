@@ -13,7 +13,7 @@
  * `input_text.mirage_accent_color`).
  * The localStorage usage here is a stand-in for that server-side persistence.
  */
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import type { Theme, CardStyle, SettingsContextType, TextColors, FontStyle, Preset, SettingsState, CardTextColorMode, Language } from '../types';
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -67,9 +67,9 @@ const DEFAULTS: SettingsState = {
     language: 'en',
 };
 
-const DEFAULT_PRESETS: Preset[] = [
+const DEFAULT_PRESETS_STRUCTURE = [
   {
-    name: 'Mirage Default',
+    key: 'mirage_default',
     isDefault: true,
     settings: {
       cardStyle: 'glass',
@@ -83,7 +83,7 @@ const DEFAULT_PRESETS: Preset[] = [
     }
   },
   {
-    name: 'Pure Glass',
+    key: 'pure_glass',
     isDefault: true,
     settings: {
       cardStyle: 'glass',
@@ -96,7 +96,7 @@ const DEFAULT_PRESETS: Preset[] = [
     }
   },
   {
-    name: 'Minimalist Solid',
+    key: 'minimalist_solid',
     isDefault: true,
     settings: {
       cardStyle: 'solid',
@@ -108,7 +108,9 @@ const DEFAULT_PRESETS: Preset[] = [
       cardTextColorMode: 'dark',
     }
   }
-];
+// Fix: Add 'as const' to enforce literal types for properties like 'cardStyle',
+// making it compatible with the 'Preset' type definition.
+] as const;
 
 // Translations are embedded directly to avoid async loading issues in the preview environment.
 const translationsMap: { [key in Language]: { [key: string]: string } } = {
@@ -130,15 +132,17 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "bgNote": "Note: An uploaded image will always take precedence over a page background color.", "advanced": "Advanced",
       "export": "Export", "import": "Import", "settingsCopied": "Settings copied to clipboard!",
       "pasteSettingsPrompt": "Paste your Mirage UI settings string:", "importError": "Invalid settings format. Could not import.",
-      "resetToDefaults": "Reset to Defaults", "language": "Language", "primary": "Primary", "secondary": "Secondary"
+      "resetToDefaults": "Reset to Defaults", "language": "Language", "primary": "Primary", "secondary": "Secondary",
+      "undoPresetLoadTooltip": "Revert to state before loading a preset",
+      "presetMirageDefault": "Mirage Default", "presetPureGlass": "Pure Glass", "presetMinimalistSolid": "Minimalist Solid"
     },
     de: {
       "configTitle": "Mirage UI Konfiguration", "livePreview": "Mirage Live-Vorschau", "previewCardTitle": "Mirage Card Vorschau",
-      "previewCardContent": "Dies ist eine Vorschau Ihrer aktuellen Einstellungen.", "example": "Beispiel", "presets": "Presets",
-      "loadPreset": "Preset laden", "defaultPresets": "Standard-Presets", "myPresets": "Meine Presets", "undo": "Rückgängig",
-      "deletePreset": "\"{presetName}\" löschen", "saveCurrentStyle": "Aktuellen Stil speichern", "newPresetPlaceholder": "Name für neues Preset...",
+      "previewCardContent": "Dies ist eine Vorschau Ihrer aktuellen Einstellungen.", "example": "Beispiel", "presets": "Vorgaben",
+      "loadPreset": "Vorgabe laden", "defaultPresets": "Standardvorgaben", "myPresets": "Meine Vorgaben", "undo": "Rückgängig",
+      "deletePreset": "Vorgabe \"{presetName}\" löschen", "saveCurrentStyle": "Als Vorgabe speichern", "newPresetPlaceholder": "Name für neue Vorgabe...",
       "save": "Speichern", "theme": "Theme", "mode": "Modus", "light": "Hell", "dark": "Dunkel", "cardStyle": "Kartenstil",
-      "glass": "Glas", "solid": "Solid", "paper": "Papier", "floating": "Schwebend", "blurIntensity": "Unschärfe",
+      "glass": "Glas", "solid": "Deckend", "paper": "Papier", "floating": "Schwebend", "blurIntensity": "Unschärfe",
       "transparency": "Transparenz", "cardColor": "Kachel-Hintergrundfarbe", "opacity": "Deckkraft",
       "appearance": "Erscheinungsbild", "borderRadius": "Randradius", "borderWidth": "Randbreite", "separatorWidth": "Trennerbreite",
       "cardTextColor": "Karten-Textfarbe", "auto": "Auto", "fontStyle": "Schriftart", "system": "System", "serif": "Serif",
@@ -150,7 +154,9 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "bgNote": "Hinweis: Ein hochgeladenes Bild hat immer Vorrang vor einer Seitenhintergrundfarbe.", "advanced": "Erweitert",
       "export": "Exportieren", "import": "Importieren", "settingsCopied": "Einstellungen in die Zwischenablage kopiert!",
       "pasteSettingsPrompt": "Fügen Sie Ihre Mirage UI Einstellungs-Zeichenfolge ein:", "importError": "Ungültiges Einstellungsformat. Import fehlgeschlagen.",
-      "resetToDefaults": "Auf Standard zurücksetzen", "language": "Sprache", "primary": "Primär", "secondary": "Sekundär"
+      "resetToDefaults": "Auf Standard zurücksetzen", "language": "Sprache", "primary": "Primär", "secondary": "Sekundär",
+      "undoPresetLoadTooltip": "Auf den Zustand vor dem Laden der Vorgabe zurücksetzen",
+      "presetMirageDefault": "Mirage Standard", "presetPureGlass": "Pures Glas", "presetMinimalistSolid": "Minimalistisch Deckend"
     },
     fr: {
       "configTitle": "Configuration de l'interface Mirage", "livePreview": "Aperçu en direct de Mirage", "previewCardTitle": "Aperçu de la carte Mirage",
@@ -170,7 +176,9 @@ const translationsMap: { [key in Language]: { [key: string]: string } } = {
       "bgNote": "Remarque : Une image téléchargée prévaudra toujours sur la couleur de fond de la page.", "advanced": "Avancé",
       "export": "Exporter", "import": "Importer", "settingsCopied": "Paramètres copiés dans le presse-papiers !",
       "pasteSettingsPrompt": "Collez votre chaîne de paramètres de l'interface Mirage :", "importError": "Format de paramètres non valide. L'importation a échoué.",
-      "resetToDefaults": "Réinitialiser les paramètres par défaut", "language": "Langue", "primary": "Primaire", "secondary": "Secondaire"
+      "resetToDefaults": "Réinitialiser les paramètres par défaut", "language": "Langue", "primary": "Primaire", "secondary": "Secondaire",
+      "undoPresetLoadTooltip": "Revenir à l'état avant de charger le préréglage",
+      "presetMirageDefault": "Mirage Défaut", "presetPureGlass": "Verre Pur", "presetMinimalistSolid": "Solide Minimaliste"
     }
 };
 
@@ -229,6 +237,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
         return translation;
     }, [language]);
+    
+    const DEFAULT_PRESETS: Preset[] = useMemo(() => {
+        const nameMap: { [key: string]: string } = {
+            'mirage_default': 'presetMirageDefault',
+            'pure_glass': 'presetPureGlass',
+            'minimalist_solid': 'presetMinimalistSolid'
+        };
+        return DEFAULT_PRESETS_STRUCTURE.map(p => ({
+            ...p,
+            name: t(nameMap[p.key]),
+        }));
+    }, [t]);
 
     const setters: Record<keyof SettingsState, Function> = {
       theme: setTheme, cardStyle: setCardStyle, transparency: setTransparency, blurIntensity: setBlurIntensity,
@@ -247,13 +267,15 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     useEffect(() => {
         try {
             const storedPresets = localStorage.getItem('mirage_custom_presets');
-            const customPresets = storedPresets ? JSON.parse(storedPresets) : [];
+            let customPresets = storedPresets ? JSON.parse(storedPresets) : [];
+            // Add key property for backward compatibility
+            customPresets = customPresets.map((p: any) => ({ ...p, key: p.key || p.name }));
             setPresets([...DEFAULT_PRESETS, ...customPresets]);
         } catch (error) {
             console.error("Failed to parse presets from localStorage", error);
             setPresets([...DEFAULT_PRESETS]);
         }
-    }, []);
+    }, [DEFAULT_PRESETS]);
     
     const applyPreset = useCallback((preset: Preset) => {
         Object.entries(preset.settings).forEach(([key, value]) => {
@@ -265,7 +287,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, []);
     
     const resetSettings = useCallback(() => {
-        applyPreset({name: 'Defaults', settings: DEFAULTS as Partial<SettingsState>});
+        applyPreset({key: 'defaults', name: 'Defaults', settings: DEFAULTS as Partial<SettingsState>});
     }, [applyPreset]);
 
     const getCurrentSettings = (): SettingsState => ({
@@ -277,17 +299,18 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
 
     const savePreset = (name: string) => {
-      const newPreset: Preset = { name, settings: getCurrentSettings() };
-      const newPresets = [...presets.filter(p => !p.isDefault && p.name !== name), newPreset];
+      const trimmedName = name.trim();
+      const newPreset: Preset = { key: trimmedName, name: trimmedName, settings: getCurrentSettings() };
+      const newPresets = [...presets.filter(p => !p.isDefault && p.key !== trimmedName), newPreset];
       
       setPresets([...DEFAULT_PRESETS, ...newPresets]);
-      localStorage.setItem('mirage_custom_presets', JSON.stringify(newPresets));
+      localStorage.setItem('mirage_custom_presets', JSON.stringify(newPresets.map(({key, name, settings}) => ({key, name, settings}))));
     };
 
-    const deletePreset = (name: string) => {
-        const newPresets = presets.filter(p => p.name !== name && !p.isDefault);
+    const deletePreset = (key: string) => {
+        const newPresets = presets.filter(p => p.key !== key && !p.isDefault);
         setPresets([...DEFAULT_PRESETS, ...newPresets]);
-        localStorage.setItem('mirage_custom_presets', JSON.stringify(newPresets));
+        localStorage.setItem('mirage_custom_presets', JSON.stringify(newPresets.map(({key, name, settings}) => ({key, name, settings}))));
     };
 
     const exportSettings = () => {
@@ -299,7 +322,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const settings = JSON.parse(settingsString);
         // Basic validation
         if (typeof settings === 'object' && settings !== null && 'cardStyle' in settings) {
-          applyPreset({ name: 'Imported', settings });
+          applyPreset({ key: 'imported', name: 'Imported', settings });
           return true;
         }
         return false;
