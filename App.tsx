@@ -177,7 +177,9 @@ const Dashboard: React.FC = () => {
         .glass-slider::before { content: ''; position: absolute; inset: 0; border-radius: 9999px; background-color: ${theme === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)'}; backdrop-filter: blur(2px); border: 1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}; box-shadow: inset 0 1px 2px ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; }
         .glass-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--mirage-slider-thumb-bg-color); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; position: relative; z-index: 10; }
         .glass-slider::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--mirage-slider-thumb-bg-color); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
-        .glass-slider:hover::-webkit-slider-thumb, .glass-slider:hover::-moz-range-thumb { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
+        ${animationsEnabled ? `
+          .glass-slider:hover::-webkit-slider-thumb, .glass-slider:hover::-moz-range-thumb { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
+        ` : ''}
         .glass-slider:active::-webkit-slider-thumb, .glass-slider:active::-moz-range-thumb { transform: scale(0.95); }
         .upload-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; background-color: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}; border: 1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}; }
         .upload-btn:hover { background-color: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}; }
@@ -224,12 +226,13 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-around">
               {quickActions.map(action => {
                 const isActive = activeQuickAction === action.id;
-                const baseClasses = `flex flex-col items-center justify-center space-y-2 w-20 h-20 rounded-full transition-all duration-200 transform hover:scale-105`;
+                const baseClasses = `flex flex-col items-center justify-center space-y-2 w-20 h-20 rounded-full transition-all duration-200 transform`;
+                const hoverClass = animationsEnabled ? 'hover:scale-105' : '';
                 const themeClasses = theme === 'dark' ? 'bg-white/5 hover:bg-white/10' : 'bg-black/5 hover:bg-black/10';
                 const activeStyle: React.CSSProperties = { backgroundColor: hexToRgba(accentColor, 0.3), transform: 'scale(1.05)' };
                 
                 return (
-                  <button key={action.id} onClick={() => handleQuickAction(action.id)} className={`${baseClasses} ${themeClasses}`} style={isActive ? activeStyle : {}}>
+                  <button key={action.id} onClick={() => handleQuickAction(action.id)} className={`${baseClasses} ${themeClasses} ${hoverClass}`} style={isActive ? activeStyle : {}}>
                     <action.icon className="w-8 h-8" style={isActive ? {color: accentColor} : {}}/>
                     <span className="text-xs font-semibold" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{action.name}</span>
                   </button>
@@ -330,7 +333,7 @@ const Dashboard: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
-                  <FanIcon className={`w-6 h-6 ${dimmer.isOn ? 'animate-spin' : ''}`} style={{ animationDuration: dimmer.isOn ? `${2.5 - (dimmer.brightness / 100 * 2)}s` : '0s', color: dimmer.isOn ? accentColor : 'var(--mirage-card-secondary-text-color)' }} />
+                  <FanIcon className={`w-6 h-6 ${dimmer.isOn && animationsEnabled ? 'animate-spin' : ''}`} style={{ animationDuration: dimmer.isOn ? `${2.5 - (dimmer.brightness / 100 * 2)}s` : '0s', color: dimmer.isOn ? accentColor : 'var(--mirage-card-secondary-text-color)' }} />
                   <span>{dimmer.isOn ? `On - ${dimmer.brightness}%` : 'Off'}</span>
                 </div>
                 <ToggleSwitch isOn={dimmer.isOn} onToggle={handleDimmerToggle} theme={theme} accentColor={accentColor} />

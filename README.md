@@ -20,6 +20,7 @@ Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwe
 - **Preset-System**: Speichere, lade und teile deine Designs mühelos.
 - **Import & Export**: Sichere deine Einstellungen oder teile sie mit der Community.
 - **Eigene Hintergründe**: Lade unterschiedliche Hintergrundbilder für dein helles und dunkles Theme hoch.
+- **Deaktivierbare Animationen**: Schalte alle UI-Animationen mit einem Klick aus. Dies entfernt Hover-Effekte (wie das Vergrößern von Buttons), kontinuierliche Animationen (wie das rotierende Ventilator-Icon) und sanfte Übergänge für ein statisches, reaktionsschnelles Interface.
 
 ---
 
@@ -115,6 +116,7 @@ This package is a single, unified **integration** that provides:
 - **Preset System**: Save, load, and share your designs with ease.
 - **Import & Export**: Back up your settings or share them with the community.
 - **Custom Backgrounds**: Upload different background images for your light and dark themes.
+- **Toggleable Animations**: Disable all UI animations with a single switch. This removes hover effects (like button scaling), continuous animations (like the spinning fan icon), and smooth transitions for a static, snappy interface.
 
 ---
 
