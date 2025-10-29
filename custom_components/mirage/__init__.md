@@ -13,6 +13,7 @@ from homeassistant.config_entries import ConfigEntry
 import voluptuous as vol
 
 from .const import DOMAIN
+from . import frontend
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -173,6 +174,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     static_path_url = "/mirage_static"
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
     hass.http.async_register_static_path(static_path_url, static_path_dir, cache_headers=False)
+
+    # Register the Mirage Card Lovelace resource via the frontend module
+    await frontend.async_register(hass, static_path_url)
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
