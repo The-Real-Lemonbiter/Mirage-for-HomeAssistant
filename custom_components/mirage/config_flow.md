@@ -12,7 +12,8 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-class MirageConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+@config_entries.HANDLERS.register(DOMAIN)
+class MirageConfigFlow(config_entries.ConfigFlow):
     """Handle a config flow for Mirage UI."""
     VERSION = 1
 

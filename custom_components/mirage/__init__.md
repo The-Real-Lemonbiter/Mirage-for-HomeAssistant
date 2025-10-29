@@ -9,13 +9,6 @@ from typing import Any, Dict
 
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.lovelace.resources import (
-    async_get_resource_id_by_url,
-    async_delete_resource,
-)
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.json import JSONEncoder
-from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
 from .const import DOMAIN
@@ -174,12 +167,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Mirage UI from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    # Register the custom settings panel
-    # The key is the domain of the integration.
-    # The URL should point to the entrypoint of your settings UI.
+    # Register the static path for the configuration panel and other www assets.
+    # This makes files in `custom_components/mirage/www` available at `/mirage_static`.
+    static_path_url = "/mirage_static"
+    static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
+    hass.http.register_static_path(static_path_url, static_path_dir, cache_headers=False)
+
+    # Register the custom settings panel, pointing to the URL provided by the static path.
+    # Home Assistant will automatically use this for the options flow.
     hass.components.frontend.async_register_webcomponent(
-        "mirage-config-panel",
-        hass.config.path(f"custom_components/{DOMAIN}/www/mirage-options.html")
+        "config-panel-mirage",
+        f"{static_path_url}/mirage-options.html"
     )
     
     # Register the WebSocket handlers

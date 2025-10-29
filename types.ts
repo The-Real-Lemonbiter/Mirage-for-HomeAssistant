@@ -33,7 +33,7 @@ export interface SensorDevice {
   id:string;
   name: string;
   value: string;
-  icon: 'door' | 'humidity' | 'temperature';
+  icon: 'door' | 'humidity' | 'temperature' | 'cpu' | 'ram' | 'storage' | 'download' | 'upload' | 'devices';
 }
 
 export interface MediaDevice {
