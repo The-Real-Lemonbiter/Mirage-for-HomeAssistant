@@ -295,3 +295,15 @@ export const LanguageIcon: React.FC<IconProps> = ({ className, style }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 18a9 9 0 009-9M3 12a9 9 0 019-9m-9 9a9 9 0 009 9m-9-9h18" />
     </svg>
 );
+
+export const RobotIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 3.785a2 2 0 012.339-1.95 2 2 0 012.34 1.95M9 15v3a2 2 0 002 2h2a2 2 0 002-2v-3m-7 0h10M5.225 9.45a3.989 3.989 0 01-1.225-2.7V6c0-1.105.895-2 2-2h12c1.105 0 2 .895 2 2v.75a3.989 3.989 0 01-1.225 2.7m-13.55 0a3.989 3.989 0 01-1.225 2.7V15c0 1.105.895 2 2 2h12c1.105 0 2-.895 2-2v-2.85a3.989 3.989 0 01-1.225-2.7m-13.55 0a4 4 0 118 0m-8 0a4 4 0 008 0m2 0a4 4 0 11-8 0m8 0a4 4 0 00-8 0" />
+    </svg>
+);
+
+export const SendIcon: React.FC<IconProps> = ({ className, style }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+);
