@@ -98,298 +98,236 @@ const Dashboard: React.FC = () => {
       backgroundStyle.backgroundColor = activeThemeConfig.bgColor;
   }
 
+  const getIcon = (icon: SensorDevice['icon']) => {
+    const iconProps = { className: "w-5 h-5" };
+    switch (icon) {
+      case 'door': return <DoorIcon {...iconProps} style={{ color: doorColor }} />;
+      case 'humidity': return <HumidityIcon {...iconProps} style={{ color: humidityColor }} />;
+      case 'cpu': return <ChipIcon {...iconProps} />;
+      case 'ram': return <MemoryIcon {...iconProps} />;
+      case 'storage': return <StorageIcon {...iconProps} />;
+      case 'download': return <ArrowDownTrayIcon {...iconProps} />;
+      case 'upload': return <ArrowUpTrayIcon {...iconProps} />;
+      case 'devices': return <DevicePhoneMobileIcon {...iconProps} />;
+      default: return null;
+    }
+  };
+
   return (
-    <div 
-      className={`min-h-screen w-full bg-cover bg-center bg-fixed p-4 sm:p-6 lg:p-8 transition-all duration-500`} 
-      style={backgroundStyle}
-    >
-      <main className="max-w-7xl mx-auto">
-        <header className="mb-8 flex justify-between items-start">
+    <div className="min-h-screen bg-cover bg-center bg-fixed transition-all" style={backgroundStyle}>
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      
+      <main className="p-4 sm:p-6 md:p-8">
+        <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold">Good Morning</h1>
-            <p className="text-xl" style={{ color: currentTextColors.secondary }}>
+            <h1 className="text-3xl font-bold tracking-tight" style={{textShadow: '0 2px 4px rgba(0,0,0,0.2)'}}>
+              Mirage
+            </h1>
+            <p className="text-lg" style={{ color: currentTextColors.secondary, textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
               {dateState.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              {' - '}
-              {dateState.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-                onClick={() => setIsSettingsOpen(true)}
-                className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
-                title="Open Mirage UI Settings"
-                aria-label="Open settings panel"
+          <div className="flex items-center space-x-4">
+             <p className="text-3xl font-light tabular-nums" style={{textShadow: '0 1px 3px rgba(0,0,0,0.2)'}}>
+              {dateState.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+            </p>
+            <button 
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-3 rounded-full hover:bg-black/10 transition-colors"
+              aria-label="Open Settings"
             >
-                <SettingsIcon className="w-6 h-6" style={{color: currentTextColors.secondary}}/>
+              <SettingsIcon className="w-6 h-6" />
             </button>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           
           <MirageCard title="Lights" {...mirageCardProps}>
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <LightbulbIcon className={`w-6 h-6 transition-colors`} style={{color: lights.livingRoom ? accentColor : 'var(--mirage-card-secondary-text-color)'}} />
-                  <span className="transition-colors" style={{color: lights.livingRoom ? accentColor : 'inherit'}}>Living Room</span>
+              {Object.entries(lights).map(([key, isOn]) => (
+                <div key={key} className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <LightbulbIcon className="w-6 h-6" style={{ color: isOn ? accentColor : 'currentColor', opacity: isOn ? 1 : 0.4 }}/>
+                    <span>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</span>
+                  </div>
+                  <ToggleSwitch isOn={isOn} onToggle={() => handleLightToggle(key as keyof typeof lights)} theme={theme} accentColor={accentColor} />
                 </div>
-                <ToggleSwitch isOn={lights.livingRoom} onToggle={() => handleLightToggle('livingRoom')} theme={theme} accentColor={accentColor} />
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                   <LightbulbIcon className={`w-6 h-6 transition-colors`} style={{color: lights.kitchen ? accentColor : 'var(--mirage-card-secondary-text-color)'}} />
-                  <span className="transition-colors" style={{color: lights.kitchen ? accentColor : 'inherit'}}>Kitchen</span>
-                </div>
-                <ToggleSwitch isOn={lights.kitchen} onToggle={() => handleLightToggle('kitchen')} theme={theme} accentColor={accentColor} />
-              </div>
-              <div className="flex justify-between items-center">
-                 <div className="flex items-center space-x-3">
-                  <LightbulbIcon className={`w-6 h-6 transition-colors`} style={{color: lights.bedroom ? accentColor : 'var(--mirage-card-secondary-text-color)'}} />
-                  <span className="transition-colors" style={{color: lights.bedroom ? accentColor : 'inherit'}}>Bedroom</span>
-                </div>
-                <ToggleSwitch isOn={lights.bedroom} onToggle={() => handleLightToggle('bedroom')} theme={theme} accentColor={accentColor} />
-              </div>
+              ))}
             </div>
           </MirageCard>
 
           <MirageCard title="Climate" {...mirageCardProps}>
              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                    <ThermostatIcon className="w-8 h-8" style={{ color: temperatureColor || accentColor }}/>
+                    <ThermostatIcon className="w-8 h-8" style={{ color: temperatureColor }} />
                     <div>
-                        <p className="text-lg">{thermostat.name}</p>
-                        <p className="text-xs" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Currently {thermostat.currentTemp}°C</p>
+                        <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>Inside</p>
+                        <p className="text-2xl font-bold">{thermostat.currentTemp}°C</p>
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-4xl font-bold">{thermostat.targetTemp}°</p>
-                    <div className="flex items-center space-x-2 mt-1">
-                        <button onClick={() => adjustTemp(-1)} className={`w-8 h-8 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>-</button>
-                        <button onClick={() => adjustTemp(1)} className={`w-8 h-8 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>+</button>
+                    <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>Set to</p>
+                    <div className="flex items-center space-x-2">
+                      <button onClick={() => adjustTemp(-1)} className="text-2xl p-1 leading-none">-</button>
+                      <p className="text-2xl font-bold tabular-nums">{thermostat.targetTemp}°C</p>
+                      <button onClick={() => adjustTemp(1)} className="text-2xl p-1 leading-none">+</button>
                     </div>
                 </div>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Scenes" {...mirageCardProps}>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <MovieIcon className={`w-6 h-6 transition-colors`} style={{color: scenes.movie ? accentColor : 'var(--mirage-card-secondary-text-color)'}} />
-                  <span className="transition-colors" style={{color: scenes.movie ? accentColor : 'inherit'}}>Movie Time</span>
-                </div>
-                <ToggleSwitch isOn={scenes.movie} onToggle={() => toggleScene('movie')} theme={theme} accentColor={accentColor} />
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <BedIcon className={`w-6 h-6 transition-colors`} style={{color: scenes.goodnight ? accentColor : 'var(--mirage-card-secondary-text-color)'}} />
-                  <span className="transition-colors" style={{color: scenes.goodnight ? accentColor : 'inherit'}}>Good Night</span>
-                </div>
-                <ToggleSwitch isOn={scenes.goodnight} onToggle={() => toggleScene('goodnight')} theme={theme} accentColor={accentColor} />
-              </div>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Weather" {...mirageCardProps}>
-            <div className="flex items-center space-x-4">
-                <WeatherCloudyIcon className="w-12 h-12" style={{ color: weatherColor || accentColor }}/>
-                <div>
-                    <p className="text-4xl font-bold">{weather.temp}°</p>
-                    <p className="text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{weather.condition}</p>
-                </div>
-            </div>
-          </MirageCard>
-          
-          <MirageCard title="Now Playing" {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center space-x-4">
-                <img src={media.albumArt} alt="Album Art" className="w-24 h-24 rounded-lg shadow-lg" />
-                <div className="flex-1">
-                    <p className="font-bold text-lg">{media.title}</p>
-                    <p style={{color: 'var(--mirage-card-secondary-text-color)'}}>{media.artist}</p>
-                    <div className="flex items-center space-x-4 mt-4">
-                        <button className="transition-colors" style={{color: 'var(--mirage-card-secondary-text-color)'}}><PrevIcon className="w-6 h-6" /></button>
-                        <button onClick={togglePlay} className={`w-12 h-12 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/20 hover:bg-white/30' : 'bg-black/10 hover:bg-black/20'}`}>
-                           {media.isPlaying ? <PauseIcon className="w-6 h-6" /> : <PlayIcon className="w-6 h-6" />}
-                        </button>
-                        <button className="transition-colors" style={{color: 'var(--mirage-card-secondary-text-color)'}}><NextIcon className="w-6 h-6" /></button>
-                    </div>
-                </div>
-                <SpeakerIcon className="w-6 h-6 self-start" style={{color: 'var(--mirage-card-secondary-text-color)'}}/>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="System Status" {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
-            <div className="space-y-4">
-                {systemStatus.map(sensor => {
-                    let Icon;
-                    switch (sensor.icon) {
-                        case 'cpu': Icon = ChipIcon; break;
-                        case 'ram': Icon = MemoryIcon; break;
-                        case 'storage': Icon = StorageIcon; break;
-                        default: Icon = LightbulbIcon;
-                    }
-                    return (
-                        <div key={sensor.id} className="flex justify-between items-center">
-                            <div className="flex items-center space-x-3">
-                                <Icon className="w-6 h-6" style={{ color: accentColor }}/>
-                                <span>{sensor.name}</span>
-                            </div>
-                            <span className="font-medium">{sensor.value}</span>
-                        </div>
-                    );
-                })}
-            </div>
+             </div>
           </MirageCard>
 
           <MirageCard title="Sensors" {...mirageCardProps}>
             <div className="space-y-4">
-                {sensors.map(sensor => {
-                    let Icon;
-                    let color;
-                    switch (sensor.icon) {
-                        case 'door': Icon = DoorIcon; color = doorColor || accentColor; break;
-                        case 'humidity': Icon = HumidityIcon; color = humidityColor || accentColor; break;
-                        default: Icon = LightbulbIcon; color = accentColor;
-                    }
-                    return (
-                        <div key={sensor.id} className="flex justify-between items-center">
-                            <div className="flex items-center space-x-3">
-                                <Icon className="w-6 h-6" style={{ color }}/>
-                                <span>{sensor.name}</span>
-                            </div>
-                            <span className="font-medium">{sensor.value}</span>
-                        </div>
-                    );
-                })}
+              {sensors.map(sensor => (
+                <div key={sensor.id} className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    {getIcon(sensor.icon)}
+                    <span>{sensor.name}</span>
+                  </div>
+                  <span className="font-semibold">{sensor.value}</span>
+                </div>
+              ))}
             </div>
           </MirageCard>
           
-          <MirageCard title="Who's Home" {...mirageCardProps}>
+          <MirageCard title="Media Player" {...mirageCardProps}>
+            <div className="flex items-center space-x-4">
+              <img src={media.albumArt} alt="Album Art" className="w-20 h-20 rounded-md" />
+              <div className="flex-1">
+                <p className="font-bold truncate">{media.title}</p>
+                <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{media.artist}</p>
+                <div className="flex items-center space-x-4 mt-2">
+                  <button><PrevIcon className="w-6 h-6" /></button>
+                  <button onClick={togglePlay}>
+                    {media.isPlaying ? <PauseIcon className="w-8 h-8" /> : <PlayIcon className="w-8 h-8" />}
+                  </button>
+                  <button><NextIcon className="w-6 h-6" /></button>
+                </div>
+              </div>
+            </div>
+          </MirageCard>
+
+          <MirageCard title="Scenes" {...mirageCardProps}>
+            <div className="grid grid-cols-2 gap-4">
+              <button onClick={() => toggleScene('movie')} className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${scenes.movie ? 'bg-blue-500/30' : 'bg-white/5 hover:bg-white/10'}`}>
+                <MovieIcon className="w-8 h-8" />
+                <span>Movie Time</span>
+              </button>
+               <button onClick={() => toggleScene('goodnight')} className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${scenes.goodnight ? 'bg-blue-500/30' : 'bg-white/5 hover:bg-white/10'}`}>
+                <BedIcon className="w-8 h-8" />
+                <span>Goodnight</span>
+              </button>
+            </div>
+          </MirageCard>
+          
+          <MirageCard title="Weather" {...mirageCardProps}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <WeatherCloudyIcon className="w-10 h-10" style={{ color: weatherColor }} />
+                <div>
+                  <p className="text-2xl font-bold">{weather.temp}°C</p>
+                  <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{weather.condition}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p>H: 22°</p>
+                <p>L: 15°</p>
+              </div>
+            </div>
+          </MirageCard>
+
+          <MirageCard title="Users" {...mirageCardProps}>
             <div className="space-y-3">
-                {users.map(user => (
-                    <div key={user.id} className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: user.status === 'Home' ? accentColor : (theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)')}}>
-                          <UserIcon className="w-5 h-5" style={{ color: user.status === 'Home' ? 'white' : 'var(--mirage-card-secondary-text-color)' }} />
-                        </div>
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-xs" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{user.status}</p>
-                        </div>
+              {users.map(user => (
+                <div key={user.id} className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <UserIcon className="w-6 h-6" />
+                    <span>{user.name}</span>
+                  </div>
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.status === 'Home' ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}`}>{user.status}</span>
+                </div>
+              ))}
+            </div>
+          </MirageCard>
+
+          <MirageCard title="Switches" {...mirageCardProps}>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <CloudRainIcon className="w-6 h-6" />
+                  <span>Sprinkler</span>
+                </div>
+                <ToggleSwitch isOn={switches.sprinkler} onToggle={() => handleSwitchToggle('sprinkler')} theme={theme} accentColor={accentColor} />
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <SparklesIcon className="w-6 h-6" />
+                  <span>Pool Pump</span>
+                </div>
+                <ToggleSwitch isOn={switches.poolPump} onToggle={() => handleSwitchToggle('poolPump')} theme={theme} accentColor={accentColor} />
+              </div>
+            </div>
+          </MirageCard>
+
+          <MirageCard title="System Status" {...mirageCardProps} className="md:col-span-2 lg:col-span-1">
+             <div className="space-y-3">
+                {systemStatus.map(sensor => (
+                  <div key={sensor.id} className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      {getIcon(sensor.icon)}
+                      <span>{sensor.name}</span>
                     </div>
+                    <span className="font-mono text-sm">{sensor.value}</span>
+                  </div>
                 ))}
             </div>
           </MirageCard>
-
-          <MirageCard title="Geräte" {...mirageCardProps}>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => handleSwitchToggle('sprinkler')}
-                className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-all duration-300`}
-                style={{ 
-                  backgroundColor: switches.sprinkler ? accentColor : (theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'),
-                  color: switches.sprinkler ? 'white' : 'var(--mirage-card-secondary-text-color)'
-                }}
-              >
-                <CloudRainIcon className="w-8 h-8" />
-                <span className="text-sm font-medium" style={{ color: switches.sprinkler ? 'white' : 'var(--mirage-card-primary-text-color)'}}>Sprinkler</span>
-              </button>
-              <button 
-                onClick={() => handleSwitchToggle('poolPump')}
-                className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-all duration-300`}
-                style={{ 
-                  backgroundColor: switches.poolPump ? accentColor : (theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'),
-                  color: switches.poolPump ? 'white' : 'var(--mirage-card-secondary-text-color)'
-                }}
-              >
-                <SparklesIcon className="w-8 h-8" />
-                <span className="text-sm font-medium" style={{ color: switches.poolPump ? 'white' : 'var(--mirage-card-primary-text-color)'}}>Pool-Pumpe</span>
-              </button>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Quick Actions" {...mirageCardProps}>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="flex flex-col items-center space-y-2">
-                <button className={`w-16 h-16 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-                  <PowerOffIcon className="w-8 h-8" />
-                </button>
-                <span className="text-xs" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Lights Off</span>
-              </div>
-              <div className="flex flex-col items-center space-y-2">
-                <button className={`w-16 h-16 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-                  <RobotIcon className="w-8 h-8" />
-                </button>
-                <span className="text-xs" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Clean House</span>
-              </div>
-              <div className="flex flex-col items-center space-y-2">
-                <button className={`w-16 h-16 rounded-full transition-colors flex items-center justify-center ${theme === 'dark' ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-                  <ShieldCheckIcon className="w-8 h-8" />
-                </button>
-                <span className="text-xs" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Secure Home</span>
-              </div>
+          
+          <MirageCard title="Network" {...mirageCardProps}>
+             <div className="space-y-3">
+                {networkStatus.map(sensor => (
+                  <div key={sensor.id} className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      {getIcon(sensor.icon)}
+                      <span>{sensor.name}</span>
+                    </div>
+                    <span className="font-mono text-sm">{sensor.value}</span>
+                  </div>
+                ))}
             </div>
           </MirageCard>
           
-          <MirageCard title="Network Status" {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
-            <div className="space-y-4">
-                {networkStatus.map(sensor => {
-                    let Icon;
-                    switch (sensor.icon) {
-                        case 'download': Icon = ArrowDownTrayIcon; break;
-                        case 'upload': Icon = ArrowUpTrayIcon; break;
-                        case 'devices': Icon = DevicePhoneMobileIcon; break;
-                        default: Icon = WifiIcon;
-                    }
-                    return (
-                        <div key={sensor.id} className="flex justify-between items-center">
-                            <div className="flex items-center space-x-3">
-                                <Icon className="w-6 h-6" style={{ color: accentColor }}/>
-                                <span>{sensor.name}</span>
-                            </div>
-                            <span className="font-medium">{sensor.value}</span>
-                        </div>
-                    );
-                })}
-            </div>
-          </MirageCard>
-          
-          <MirageCard title="Energy Usage (Last 7 Days)" {...mirageCardProps} className="sm:col-span-2 lg:col-span-4">
-            <div style={{ width: '100%', height: 200 }}>
+          <MirageCard title="Energy Usage (kWh)" {...mirageCardProps} className="md:col-span-2 lg:col-span-2">
+            <div style={{ width: '100%', height: 150 }}>
               <ResponsiveContainer>
                 <LineChart data={energyData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'} />
-                  <XAxis dataKey="day" stroke={currentTextColors.secondary} tick={{ fontSize: 12 }} />
-                  <YAxis stroke={currentTextColors.secondary} tick={{ fontSize: 12 }} unit="kWh"/>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: cardStyle === 'solid' ? (theme === 'dark' ? settings.night.solidColor : settings.day.solidColor) : (theme === 'dark' ? '#2d3748' : '#e2e8f0'),
-                      borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
-                      borderRadius: 'var(--mirage-border-radius)',
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis dataKey="day" stroke="var(--mirage-card-secondary-text-color)" tick={{ fontSize: 12 }} />
+                  <YAxis stroke="var(--mirage-card-secondary-text-color)" tick={{ fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(30,30,30,0.8)',
+                      borderColor: 'rgba(255,255,255,0.2)',
+                      borderRadius: '8px',
                     }}
-                    itemStyle={{ color: currentTextColors.primary }}
-                    labelStyle={{ color: currentTextColors.secondary }}
+                    labelStyle={{ color: '#fff' }}
                   />
-                  <Line type="monotone" dataKey="usage" stroke={accentColor} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 8 }} name="Usage" />
+                  <Line type="monotone" dataKey="usage" stroke={accentColor} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </MirageCard>
-
         </div>
       </main>
-      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
 
-// This wrapper remains for standalone preview usage if needed.
-const App: React.FC = () => {
-  return (
-    <SettingsProvider>
-      <Dashboard />
-    </SettingsProvider>
-  );
-};
+const App: React.FC = () => (
+  <SettingsProvider>
+    <Dashboard />
+  </SettingsProvider>
+);
 
 export default App;

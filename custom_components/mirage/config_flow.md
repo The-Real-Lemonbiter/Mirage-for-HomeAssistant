@@ -43,10 +43,6 @@ class MirageOptionsFlow(config_entries.OptionsFlow):
     React application located in the /www directory.
     """
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Show a placeholder form, which HA replaces with the custom UI."""
         # By returning an empty schema, we tell Home Assistant's frontend to take over
