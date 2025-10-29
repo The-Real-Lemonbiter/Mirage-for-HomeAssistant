@@ -11,9 +11,12 @@ from typing import Any, Dict
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 import voluptuous as vol
+from homeassistant.components.lovelace.resources import (
+    async_get_resource_storage,
+    ResourceStorage,
+)
 
 from .const import DOMAIN
-from . import frontend
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -175,8 +178,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
     hass.http.async_register_static_path(static_path_url, static_path_dir, cache_headers=False)
 
-    # Register the Mirage Card Lovelace resource via the frontend module
-    await frontend.async_register(hass, static_path_url)
+    # Register the Mirage Card Lovelace resource using the modern storage helper
+    resource_url = f"{static_path_url}/mirage-card.js"
+    _LOGGER.debug("Ensuring Mirage Card Lovelace resource is registered: %s", resource_url)
+    try:
+        storage: ResourceStorage = await async_get_resource_storage(hass)
+        resources = await storage.async_get_items()
+        
+        if not any(resource["url"] == resource_url for resource in resources.values()):
+            await storage.async_create_item({
+                "res_type": "module",
+                "url": resource_url
+            })
+            _LOGGER.info("Successfully registered Mirage Card Lovelace resource.")
+        else:
+            _LOGGER.debug("Mirage Card Lovelace resource already registered.")
+    except Exception as e:
+        _LOGGER.error("Failed to register Mirage Card Lovelace resource: %s", e)
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
