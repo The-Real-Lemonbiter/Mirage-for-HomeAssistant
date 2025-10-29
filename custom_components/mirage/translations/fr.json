@@ -1,0 +1,74 @@
+
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurer l'interface Mirage",
+        "description": "Ceci configurera l'intégration de l'interface Mirage. Il n'y a pas d'options de données à configurer ; tous les paramètres sont gérés dans les options après l'installation."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Une seule instance de l'interface Mirage est autorisée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Paramètres de l'interface Mirage",
+        "data": {
+          "accent_color": "Couleur d'accentuation",
+          "border_radius": "Rayon de la bordure",
+          "border_width": "Largeur de la bordure",
+          "separator_width": "Largeur du séparateur",
+          "card_text_color_mode": "Couleur du texte de la carte",
+          "glass_blur": "Verre : Intensité du flou",
+          "glass_transparency": "Verre : Transparence",
+          "solid_bg_color_dark": "Solide : Arrière-plan (Sombre)",
+          "solid_bg_color_light": "Solide : Arrière-plan (Clair)",
+          "paper_bg_color_dark": "Papier : Arrière-plan (Sombre)",
+          "paper_bg_color_light": "Papier : Arrière-plan (Clair)",
+          "floating_bg_color_dark": "Flottant : Arrière-plan (Sombre)",
+          "floating_bg_color_light": "Flottant : Arrière-plan (Clair)",
+          "floating_opacity": "Flottant : Opacité",
+          "bg_color_dark": "Arrière-plan de la page (Sombre)",
+          "bg_color_light": "Arrière-plan de la page (Clair)",
+          "temperature_color": "Couleur de la température",
+          "weather_color": "Couleur de la météo",
+          "humidity_color": "Couleur de l'humidité",
+          "door_color": "Couleur de la porte",
+          "dark_primary_text_color": "Couleur du texte principal (Sombre)",
+          "dark_secondary_text_color": "Couleur du texte secondaire (Sombre)",
+          "light_primary_text_color": "Couleur du texte principal (Clair)",
+          "light_secondary_text_color": "Couleur du texte secondaire (Clair)"
+        },
+        "data_description": {
+          "temperature_color": "Laisser vide pour utiliser la couleur d'accentuation.",
+          "weather_color": "Laisser vide pour utiliser la couleur d'accentuation.",
+          "humidity_color": "Laisser vide pour utiliser la couleur d'accentuation.",
+          "door_color": "Laisser vide pour utiliser la couleur d'accentuation."
+        }
+      }
+    }
+  },
+  "selector": {
+    "card_text_color_mode": {
+      "options": {
+        "auto": "Auto (Clair sur thème sombre, Sombre sur thème clair)",
+        "light": "Clair (Pour les fonds de carte sombres)",
+        "dark": "Sombre (Pour les fonds de carte clairs)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Appliquer le préréglage",
+      "description": "Applique un préréglage Mirage UI enregistré aux paramètres globaux du thème.",
+      "fields": {
+        "preset_name": {
+          "name": "Nom du préréglage",
+          "description": "Le nom du préréglage personnalisé à appliquer."
+        }
+      }
+    }
+  }
+}

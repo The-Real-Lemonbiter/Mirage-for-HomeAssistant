@@ -6,94 +6,25 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { MirageCard } from './components/MirageCard';
 import { ToggleSwitch } from './components/ToggleSwitch';
 import { SettingsProvider, useSettings } from './components/SettingsProvider';
 import { SettingsPanel } from './components/SettingsPanel';
 import { 
   LightbulbIcon, ThermostatIcon, HumidityIcon, DoorIcon, PlayIcon, PauseIcon, NextIcon, PrevIcon, SpeakerIcon, 
-  MovieIcon, BedIcon, WeatherCloudyIcon, FanIcon,
-  ChipIcon, MemoryIcon, StorageIcon, WifiIcon, PowerOffIcon, ShieldCheckIcon, CoffeeIcon, UserIcon,
-  SettingsIcon, RobotIcon, SendIcon,
+  SettingsIcon,
 } from './components/icons';
 import type { 
-  ThermostatDevice, SensorDevice, MediaDevice, Scene, DimmerLightDevice, WeatherData,
-  SystemStatus, NetworkDevice, MirageCardProps
+  ThermostatDevice, SensorDevice, MediaDevice, MirageCardProps
 } from './types';
-import { GoogleGenAI, Type } from '@google/genai';
-
-const hexToRgba = (hex: string, alpha: number): string => {
-    if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-        return `rgba(59, 130, 246, ${alpha})`;
-    }
-    let c = hex.substring(1).split('');
-    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-    const n = parseInt(`0x${c.join('')}`);
-    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
-};
-
-const getContrastingTextColor = (hex: string): string => {
-    if (!hex || !/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return '#f8fafc';
-    let c = hex.substring(1).split('');
-    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-    const n = parseInt(`0x${c.join('')}`);
-    const r = (n >> 16) & 255;
-    const g = (n >> 8) & 255;
-    const b = n & 255;
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? '#0f172a' : '#f8fafc';
-};
-
-const Gauge: React.FC<{
-  value: number;
-  min?: number;
-  max?: number;
-  label: string;
-  unit: string;
-  color: string;
-  theme: string;
-}> = ({ value, min = 0, max = 100, label, unit, color, theme }) => {
-  const percentage = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
-  const arcLength = Math.PI * 70;
-  const strokeDashoffset = arcLength * (1 - percentage / 100);
-
-  const trackColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
-  
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <svg viewBox="0 0 200 100" className="w-full">
-        <path d="M 30 90 A 70 70 0 0 1 170 90" fill="none" stroke={trackColor} strokeWidth="12" strokeLinecap="round" />
-        <path d="M 30 90 A 70 70 0 0 1 170 90" fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" strokeDasharray={arcLength} strokeDashoffset={strokeDashoffset} style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
-      </svg>
-      <div className="text-center -mt-10">
-        <span className="text-3xl font-bold" style={{ color }}>{value.toFixed(1)}</span>
-        <span className={`ml-1 text-lg`} style={{color: 'var(--mirage-card-secondary-text-color)'}}>{unit}</span>
-      </div>
-       <p className={`text-sm mt-1 font-medium`} style={{color: 'var(--mirage-card-secondary-text-color)'}}>{label}</p>
-    </div>
-  );
-};
 
 const Dashboard: React.FC = () => {
   const [dateState, setDateState] = useState(new Date());
   const { 
-    theme, cardStyle, currentTextColors, accentColor, temperatureColor, weatherColor, 
-    humidityColor, doorColor, borderRadius, font, animationsEnabled,
-    customBgDark, customBgLight, bgColorDark, bgColorLight
+    theme, currentTextColors, activeThemeConfig, settings
   } = useSettings();
   
-  const [isUserAdmin, setIsUserAdmin] = useState(true); // Simulate admin state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [activeScene, setActiveScene] = useState<string | null>('movie_time');
-  const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
-  const [hoveredQuickAction, setHoveredQuickAction] = useState<string | null>(null);
-  const [hoveredScene, setHoveredScene] = useState<string | null>(null);
-
-  // AI State
-  const [aiPrompt, setAiPrompt] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState('Wie kann ich dir heute helfen?');
 
   useEffect(() => {
     const timer = setInterval(() => setDateState(new Date()), 1000);
@@ -108,133 +39,16 @@ const Dashboard: React.FC = () => {
     { id: 'living_humidity', name: 'Living Room Humidity', value: '45%', icon: 'humidity' },
   ]);
   const [media, setMedia] = useState<MediaDevice>({ isPlaying: true, artist: 'Lofi Girl', title: 'Beats to Relax/Study to', albumArt: 'https://picsum.photos/seed/lofi/200/200' });
-  const [dimmer, setDimmer] = useState<DimmerLightDevice>({ id: 'fan_dimmer', name: 'Ceiling Fan', isOn: true, brightness: 70 });
-  const [scenes] = useState<Scene[]>([
-    { id: 'movie_time', name: 'Movie Time', icon: MovieIcon },
-    { id: 'good_night', name: 'Good Night', icon: BedIcon },
-  ]);
-  const [weather] = useState<WeatherData>({ temperature: 18, condition: 'Partly Cloudy', icon: WeatherCloudyIcon });
-  const [temperatureHistory] = useState<SensorDevice>({ id: 'living_room_temp_history', name: 'Living Room Temperature', value: '21.5°C', icon: 'temperature', history: [ { time: '12:00', value: 20 }, { time: '13:00', value: 21 }, { time: '14:00', value: 22 }, { time: '15:00', value: 21.5 }, { time: '16:00', value: 22 }, { time: '17:00', value: 22.5 }, { time: '18:00', value: 21 } ] });
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>({ cpuTemp: 55, memoryUsage: 62, storageFree: 750, networkStatus: 'online' });
-  const [networkSpeed, setNetworkSpeed] = useState<NetworkDevice>({ downloadSpeed: 89.4, uploadSpeed: 18.2 });
   
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSystemStatus(prev => ({ ...prev, cpuTemp: 50 + Math.random() * 10, memoryUsage: 60 + Math.random() * 5 }));
-      setNetworkSpeed(prev => ({ downloadSpeed: 80 + Math.random() * 20, uploadSpeed: 15 + Math.random() * 5 }));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const handleLightToggle = (light: keyof typeof lights) => setLights(prev => ({ ...prev, [light]: !prev[light] }));
   const adjustTemp = (amount: number) => setThermostat(prev => ({ ...prev, targetTemp: prev.targetTemp + amount }));
-  const setTemp = (temp: number) => setThermostat(prev => ({ ...prev, targetTemp: temp }));
   const togglePlay = () => setMedia(prev => ({...prev, isPlaying: !prev.isPlaying}));
-  const handleDimmerToggle = () => setDimmer(prev => ({ ...prev, isOn: !prev.isOn }));
-  const handleBrightnessChange = (event: React.ChangeEvent<HTMLInputElement>) => setDimmer(prev => ({ ...prev, brightness: Number(event.target.value) }));
-  const handleSceneActivation = (id: string) => setActiveScene(id);
-  const handleQuickAction = (id: string) => {
-    setActiveQuickAction(id);
-    setTimeout(() => setActiveQuickAction(null), 500);
-  };
   
-  const handleAiSubmit = async () => {
-    if (!aiPrompt.trim() || isAiLoading) return;
-
-    setIsAiLoading(true);
-    setAiResponse('Denke nach...');
-
-    try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-        
-        const deviceContext = JSON.stringify({
-            lights,
-            thermostat,
-            sensors,
-            dimmer,
-        });
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: `Kontext der Smart-Home-Geräte: ${deviceContext}. Benutzeranfrage: "${aiPrompt}"`,
-            config: {
-                systemInstruction: `Du bist eine hilfreiche Smart-Home-KI für das "Mirage UI"-Dashboard. 
-                Analysiere die Anfrage des Benutzers und den bereitgestellten Gerätestatus. 
-                Antworte IMMER mit einem JSON-Objekt. Das JSON-Objekt muss eine Eigenschaft 'response' mit einer freundlichen, 
-                natürlichsprachlichen Antwort für den Benutzer in Deutsch enthalten. Wenn eine Aktion ausgeführt werden kann, 
-                füge eine 'action'-Eigenschaft und die erforderlichen Parameter hinzu.
-                Mögliche Aktionen sind:
-                - 'toggle_light': benötigt 'device' (z.B. 'livingRoom', 'kitchen', 'bedroom').
-                - 'set_temperature': benötigt 'value' (eine Zahl).
-                - 'adjust_temperature': benötigt 'value' (eine positive oder negative Zahl).
-                - 'toggle_fan': schaltet den Deckenventilator um.
-                - 'set_fan_speed': benötigt 'value' (eine Zahl von 0-100).
-                - 'no_action': wenn die Anfrage keine Aktion erfordert (z.B. eine Frage zum Gerätestatus).
-                Leite Gerätenamen aus dem Kontext ab (z.B. 'Wohnzimmer' -> 'livingRoom'). Sei präzise.`,
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: Type.OBJECT,
-                    properties: {
-                        response: { type: Type.STRING },
-                        action: { type: Type.STRING },
-                        device: { type: Type.STRING },
-                        value: { type: Type.NUMBER },
-                    },
-                },
-            },
-        });
-
-        const responseText = response.text.trim();
-        const parsedResponse = JSON.parse(responseText);
-
-        if (parsedResponse.action) {
-            switch (parsedResponse.action) {
-                case 'toggle_light':
-                    if (parsedResponse.device && lights.hasOwnProperty(parsedResponse.device)) {
-                        handleLightToggle(parsedResponse.device as keyof typeof lights);
-                    }
-                    break;
-                case 'set_temperature':
-                    if (typeof parsedResponse.value === 'number') {
-                        setTemp(parsedResponse.value);
-                    }
-                    break;
-                case 'adjust_temperature':
-                     if (typeof parsedResponse.value === 'number') {
-                        adjustTemp(parsedResponse.value);
-                    }
-                    break;
-                case 'toggle_fan':
-                    handleDimmerToggle();
-                    break;
-                case 'set_fan_speed':
-                    if (typeof parsedResponse.value === 'number') {
-                       setDimmer(prev => ({ ...prev, isOn: parsedResponse.value > 0, brightness: parsedResponse.value }));
-                    }
-                    break;
-            }
-        }
-        setAiResponse(parsedResponse.response || 'Ich habe das erledigt.');
-
-    } catch (error) {
-        console.error("Gemini API error:", error);
-        setAiResponse('Entschuldigung, es ist ein Fehler aufgetreten.');
-    } finally {
-        setIsAiLoading(false);
-        setAiPrompt('');
-    }
-  };
-
+  const { cardStyle, accentColor, temperatureColor, humidityColor, doorColor } = activeThemeConfig;
+  const { font } = settings.general;
 
   const mirageCardProps: Pick<MirageCardProps, 'theme' | 'cardStyle'> = { theme, cardStyle };
 
-  const quickActions = [
-    { id: 'all_off', name: 'All Off', icon: PowerOffIcon },
-    { id: 'good_morning', name: 'Morning', icon: CoffeeIcon },
-    { id: 'movie_time', name: 'Movie', icon: MovieIcon },
-    { id: 'away', name: 'Away', icon: ShieldCheckIcon },
-  ];
-  
   const fontFamilies = {
     system: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
     serif: '"Iowan Old Style", "Apple Garamond", Baskerville, "Times New Roman", "Droid Serif", Times, "Source Serif Pro", serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -247,13 +61,10 @@ const Dashboard: React.FC = () => {
     transition: 'background-color 0.5s ease',
   };
 
-  const bgImage = theme === 'dark' ? customBgDark : customBgLight;
-  const bgColor = theme === 'dark' ? bgColorDark : bgColorLight;
-
-  if (bgImage) {
-      backgroundStyle.backgroundImage = `url(${bgImage})`;
+  if (activeThemeConfig.customBg) {
+      backgroundStyle.backgroundImage = `url(${activeThemeConfig.customBg})`;
   } else {
-      backgroundStyle.backgroundColor = bgColor;
+      backgroundStyle.backgroundColor = activeThemeConfig.bgColor;
   }
 
   return (
@@ -261,34 +72,10 @@ const Dashboard: React.FC = () => {
       className={`min-h-screen w-full bg-cover bg-center bg-fixed p-4 sm:p-6 lg:p-8 transition-all duration-500`} 
       style={backgroundStyle}
     >
-      <style>{`
-        ${!animationsEnabled ? `
-          * {
-            transition: none !important;
-            animation: none !important;
-          }
-        ` : ''}
-        .glass-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 0.25rem; background: transparent; outline: none; transition: opacity .2s; position: relative; }
-        .glass-slider::before { content: ''; position: absolute; inset: 0; border-radius: 9999px; background-color: ${theme === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)'}; backdrop-filter: blur(2px); border: 1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)'}; box-shadow: inset 0 1px 2px ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; }
-        .glass-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background-color: var(--mirage-slider-thumb-bg-color); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; position: relative; z-index: 10; }
-        .glass-slider::-moz-range-thumb { width: 20px; height: 20px; background-color: var(--mirage-slider-thumb-bg-color); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; cursor: pointer; backdrop-filter: blur(4px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; }
-        ${animationsEnabled ? `
-          .glass-slider:hover::-webkit-slider-thumb, .glass-slider:hover::-moz-range-thumb { transform: scale(1.1); box-shadow: 0 4px 8px rgba(0,0,0,0.25); }
-        ` : ''}
-        .glass-slider:active::-webkit-slider-thumb, .glass-slider:active::-moz-range-thumb { transform: scale(0.95); }
-        .upload-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.2s; background-color: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}; border: 1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}; }
-        .upload-btn:hover { background-color: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}; }
-        .clear-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; background-color: transparent; color: ${theme === 'dark' ? 'rgba(255, 99, 132, 0.8)' : 'rgba(200, 50, 82, 0.9)'}; font-weight: 500; }
-        .clear-btn:hover { color: ${theme === 'dark' ? 'rgb(255, 99, 132)' : 'rgb(200, 50, 82)'}; }
-        input[type="color"] { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: transparent; width: 40px; height: 40px; border: none; cursor: pointer; }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border-radius: 8px; border: 1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.1)'}; }
-        input[type="color"]::-moz-color-swatch { border-radius: 8px; border: 1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0,0,0,0.1)'}; }
-      `}</style>
       <main className="max-w-7xl mx-auto">
         <header className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold">Good Morning{isUserAdmin ? ' (Admin)' : ''}</h1>
+            <h1 className="text-4xl md:text-5xl font-bold">Good Morning</h1>
             <p className="text-xl" style={{ color: currentTextColors.secondary }}>
               {dateState.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               {' - '}
@@ -296,14 +83,6 @@ const Dashboard: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <button
-                onClick={() => setIsUserAdmin(!isUserAdmin)}
-                className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
-                title={`Toggle Admin View (Currently: ${isUserAdmin ? 'Admin' : 'User'})`}
-                aria-label="Toggle admin view"
-            >
-                <UserIcon className="w-6 h-6" style={{color: isUserAdmin ? accentColor : currentTextColors.secondary}}/>
-            </button>
             <button
                 onClick={() => setIsSettingsOpen(true)}
                 className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
@@ -317,78 +96,7 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           
-          <MirageCard title="Quick Actions" {...mirageCardProps} className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
-            <div className="flex items-center justify-around">
-              {quickActions.map(action => {
-                const isActive = activeQuickAction === action.id;
-                const isHovered = hoveredQuickAction === action.id;
-                const isHighlighted = isActive || (isHovered && animationsEnabled);
-
-                const baseClasses = `flex flex-col items-center justify-center space-y-2 w-20 h-20 rounded-full transition-all duration-200 transform`;
-                const hoverClass = animationsEnabled ? 'hover:scale-105' : '';
-                const themeClasses = theme === 'dark' ? 'bg-white/5' : 'bg-black/5';
-
-                const buttonStyle: React.CSSProperties = {};
-                const iconStyle: React.CSSProperties = {};
-                const textStyle: React.CSSProperties = { color: 'var(--mirage-card-secondary-text-color)' };
-                
-                if (isHighlighted) {
-                    buttonStyle.backgroundColor = hexToRgba(accentColor, theme === 'dark' ? 0.45 : 0.3);
-                    const contrastColor = getContrastingTextColor(accentColor);
-                    iconStyle.color = contrastColor;
-                    textStyle.color = contrastColor;
-                }
-                
-                if (isActive) {
-                    buttonStyle.transform = 'scale(1.05)';
-                }
-                
-                return (
-                  <button 
-                    key={action.id} 
-                    onClick={() => handleQuickAction(action.id)} 
-                    onMouseEnter={() => setHoveredQuickAction(action.id)}
-                    onMouseLeave={() => setHoveredQuickAction(null)}
-                    className={`${baseClasses} ${!isHighlighted ? themeClasses : ''} ${hoverClass}`} 
-                    style={buttonStyle}
-                  >
-                    <action.icon className="w-8 h-8" style={iconStyle}/>
-                    <span className="text-xs font-semibold" style={textStyle}>{action.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </MirageCard>
-          
-          <MirageCard title="Smart-Home-KI" {...mirageCardProps} className="sm:col-span-2">
-              <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                      <RobotIcon className="w-6 h-6 flex-shrink-0" style={{color: accentColor}}/>
-                      <p className="flex-1 text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>
-                        {isAiLoading && (
-                          <span className="animate-pulse">{aiResponse}</span>
-                        )}
-                        {!isAiLoading && aiResponse}
-                      </p>
-                  </div>
-                   <form onSubmit={(e) => { e.preventDefault(); handleAiSubmit(); }} className="flex items-center space-x-2">
-                        <input
-                            type="text"
-                            value={aiPrompt}
-                            onChange={(e) => setAiPrompt(e.target.value)}
-                            placeholder="z.B. Setze die Temperatur auf 22 Grad"
-                            disabled={isAiLoading}
-                            className={`w-full bg-transparent p-2 rounded-md transition-colors border ${theme === 'dark' ? 'border-white/10 focus:border-white/30 bg-white/5' : 'border-black/10 focus:border-black/30 bg-black/5'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent`}
-                            style={{'--tw-ring-color': accentColor} as React.CSSProperties}
-                        />
-                        <button type="submit" disabled={isAiLoading || !aiPrompt.trim()} className="p-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{backgroundColor: accentColor}}>
-                            <SendIcon className="w-5 h-5" style={{color: getContrastingTextColor(accentColor)}}/>
-                        </button>
-                    </form>
-              </div>
-          </MirageCard>
-
-          <MirageCard title="Lights" {...mirageCardProps} className="md:col-span-1">
+          <MirageCard title="Lights" {...mirageCardProps}>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
@@ -414,7 +122,7 @@ const Dashboard: React.FC = () => {
             </div>
           </MirageCard>
 
-          <MirageCard title="Climate" {...mirageCardProps} className="md:col-span-1">
+          <MirageCard title="Climate" {...mirageCardProps}>
              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                     <ThermostatIcon className="w-8 h-8" style={{ color: temperatureColor || accentColor }}/>
@@ -451,30 +159,6 @@ const Dashboard: React.FC = () => {
             </div>
           </MirageCard>
 
-          <MirageCard title={temperatureHistory.name} {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
-            <div style={{ width: '100%', height: 200 }}>
-              <ResponsiveContainer>
-                <LineChart data={temperatureHistory.history} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)"} />
-                  <XAxis dataKey="time" tick={{ fill: 'var(--mirage-card-secondary-text-color)' }} fontSize={12} />
-                  <YAxis tick={{ fill: 'var(--mirage-card-secondary-text-color)' }} fontSize={12} domain={['dataMin - 1', 'dataMax + 1']} unit="°C" />
-                  <Tooltip contentStyle={{ backgroundColor: 'var(--mirage-glass-bg-color-dark)', borderColor: 'var(--mirage-glass-border-color-dark)', borderRadius: '0.75rem', backdropFilter: 'blur(4px)', color: 'var(--mirage-card-primary-text-color)' }} labelStyle={{ color: 'var(--mirage-card-primary-text-color)' }}/>
-                  <Legend wrapperStyle={{fontSize: "14px", color: 'var(--mirage-card-secondary-text-color)'}}/>
-                  <Line type="monotone" dataKey="value" name="Temp" stroke={temperatureColor || accentColor} strokeWidth={2} dot={{ r: 4, fill: temperatureColor || accentColor }} activeDot={{ r: 6 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="System Status" {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><ChipIcon className="w-6 h-6" style={{color: accentColor}}/><span>CPU Temperature</span></div><span className="font-mono">{systemStatus.cpuTemp.toFixed(1)}°C</span></div>
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><MemoryIcon className="w-6 h-6" style={{color: accentColor}}/><span>Memory Usage</span></div><span className="font-mono">{systemStatus.memoryUsage.toFixed(1)}%</span></div>
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><StorageIcon className="w-6 h-6" style={{color: accentColor}}/><span>Storage Free</span></div><span className="font-mono">{systemStatus.storageFree} GB</span></div>
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><WifiIcon className="w-6 h-6" style={{color: accentColor}}/><span>Network</span></div><span className="font-mono capitalize">{systemStatus.networkStatus}</span></div>
-            </div>
-          </MirageCard>
-
           <MirageCard title="Sensors" {...mirageCardProps}>
             <div className="space-y-4">
                 {sensors.map(sensor => {
@@ -498,100 +182,6 @@ const Dashboard: React.FC = () => {
             </div>
           </MirageCard>
           
-          <MirageCard title="Scenes" {...mirageCardProps}>
-            <div className="grid grid-cols-2 gap-4">
-              {scenes.map(scene => {
-                const isActive = activeScene === scene.id;
-                const isHovered = hoveredScene === scene.id;
-                const isHighlighted = isActive || (isHovered && animationsEnabled);
-                
-                const buttonStyle: React.CSSProperties = {
-                    transition: 'background-color 0.2s, color 0.2s, transform 0.2s'
-                };
-                const iconStyle: React.CSSProperties = { transition: 'color 0.2s' };
-                const textStyle: React.CSSProperties = { transition: 'color 0.2s', color: 'var(--mirage-card-secondary-text-color)' };
-                
-                if (isHighlighted) {
-                    buttonStyle.backgroundColor = hexToRgba(accentColor, 0.2);
-                    iconStyle.color = accentColor;
-                    textStyle.color = accentColor;
-                }
-                
-                if (isActive) {
-                    buttonStyle.transform = 'scale(1.03)';
-                }
-
-                return (
-                  <button 
-                    key={scene.id} 
-                    onClick={() => handleSceneActivation(scene.id)} 
-                    onMouseEnter={() => setHoveredScene(scene.id)}
-                    onMouseLeave={() => setHoveredScene(null)}
-                    className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transform`} 
-                    style={buttonStyle}
-                  >
-                    <scene.icon className="w-8 h-8" style={iconStyle}/>
-                    <span className="text-sm font-semibold" style={textStyle}>{scene.name}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Weather" {...mirageCardProps}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-5xl font-bold">{weather.temperature}°C</p>
-                <p className="text-lg" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{weather.condition}</p>
-              </div>
-              <weather.icon className={`w-12 h-12`} style={{ color: weatherColor || accentColor, opacity: theme === 'dark' ? 0.8 : 1 }} />
-            </div>
-          </MirageCard>
-          
-          <MirageCard title={dimmer.name} {...mirageCardProps}>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <FanIcon className={`w-6 h-6 transition-colors`} style={{color: dimmer.isOn ? accentColor : 'var(--mirage-card-secondary-text-color)'}}/>
-                  <span className="transition-colors" style={{color: dimmer.isOn ? accentColor : 'inherit'}}>Fan Power</span>
-                </div>
-                <ToggleSwitch isOn={dimmer.isOn} onToggle={handleDimmerToggle} theme={theme} accentColor={accentColor} />
-              </div>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Speed</span>
-                <div className="flex-1">
-                    <div className="relative">
-                       <input 
-                         type="range" 
-                         min="0" 
-                         max="100" 
-                         value={dimmer.brightness} 
-                         onChange={handleBrightnessChange}
-                         className="glass-slider"
-                         disabled={!dimmer.isOn}
-                       />
-                       <div 
-                         className="absolute top-0 left-0 h-1 rounded-full pointer-events-none" 
-                         style={{ width: `${dimmer.brightness}%`, backgroundColor: dimmer.isOn ? accentColor : 'transparent', transition: 'width 0.2s, background-color 0.2s' }}
-                       ></div>
-                    </div>
-                </div>
-                <span className="w-10 text-right font-mono text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{dimmer.brightness}%</span>
-              </div>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Network Speed" {...mirageCardProps} className="sm:col-span-2">
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div>
-                 <Gauge value={networkSpeed.downloadSpeed} max={150} label="Download" unit="Mbps" color={accentColor} theme={theme}/>
-              </div>
-              <div>
-                 <Gauge value={networkSpeed.uploadSpeed} max={30} label="Upload" unit="Mbps" color={accentColor} theme={theme}/>
-              </div>
-            </div>
-          </MirageCard>
-
         </div>
       </main>
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
@@ -599,6 +189,7 @@ const Dashboard: React.FC = () => {
   );
 };
 
+// This wrapper remains for standalone preview usage if needed.
 const App: React.FC = () => {
   return (
     <SettingsProvider>
@@ -607,5 +198,4 @@ const App: React.FC = () => {
   );
 };
 
-// Fix: Add default export for the App component.
 export default App;

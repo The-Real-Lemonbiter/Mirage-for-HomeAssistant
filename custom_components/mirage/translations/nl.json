@@ -1,0 +1,74 @@
+
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mirage UI instellen",
+        "description": "Dit stelt de Mirage UI-integratie in. Er zijn geen data-opties om te configureren; alle instellingen worden na de installatie in de opties beheerd."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Slechts één exemplaar van Mirage UI is toegestaan."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Mirage UI Instellingen",
+        "data": {
+          "accent_color": "Accentkleur",
+          "border_radius": "Randradius",
+          "border_width": "Randbreedte",
+          "separator_width": "Scheidingsbreedte",
+          "card_text_color_mode": "Tekstkleur Kaart",
+          "glass_blur": "Glas: Vervagingsintensiteit",
+          "glass_transparency": "Glas: Transparantie",
+          "solid_bg_color_dark": "Solide: Achtergrond (Donker)",
+          "solid_bg_color_light": "Solide: Achtergrond (Licht)",
+          "paper_bg_color_dark": "Papier: Achtergrond (Donker)",
+          "paper_bg_color_light": "Papier: Achtergrond (Licht)",
+          "floating_bg_color_dark": "Zwevend: Achtergrond (Donker)",
+          "floating_bg_color_light": "Zwevend: Achtergrond (Licht)",
+          "floating_opacity": "Zwevend: Dekking",
+          "bg_color_dark": "Pagina-achtergrond (Donker)",
+          "bg_color_light": "Pagina-achtergrond (Licht)",
+          "temperature_color": "Temperatuurkleur",
+          "weather_color": "Weerkleur",
+          "humidity_color": "Vochtigheidskleur",
+          "door_color": "Deurkleur",
+          "dark_primary_text_color": "Primaire Tekstkleur (Donker)",
+          "dark_secondary_text_color": "Secundaire Tekstkleur (Donker)",
+          "light_primary_text_color": "Primaire Tekstkleur (Licht)",
+          "light_secondary_text_color": "Secundaire Tekstkleur (Licht)"
+        },
+        "data_description": {
+          "temperature_color": "Laat leeg om de accentkleur te gebruiken.",
+          "weather_color": "Laat leeg om de accentkleur te gebruiken.",
+          "humidity_color": "Laat leeg om de accentkleur te gebruiken.",
+          "door_color": "Laat leeg om de accentkleur te gebruiken."
+        }
+      }
+    }
+  },
+  "selector": {
+    "card_text_color_mode": {
+      "options": {
+        "auto": "Auto (Licht bij donker thema, Donker bij licht thema)",
+        "light": "Licht (Voor donkere kaartachtergronden)",
+        "dark": "Donker (Voor lichte kaartachtergronden)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Voorinstelling toepassen",
+      "description": "Past een opgeslagen Mirage UI-voorinstelling toe op de algemene thema-instellingen.",
+      "fields": {
+        "preset_name": {
+          "name": "Naam voorinstelling",
+          "description": "De naam van de aangepaste voorinstelling die moet worden toegepast."
+        }
+      }
+    }
+  }
+}

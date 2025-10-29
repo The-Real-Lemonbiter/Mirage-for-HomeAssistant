@@ -1,0 +1,74 @@
+
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Skonfiguruj Mirage UI",
+        "description": "To spowoduje skonfigurowanie integracji Mirage UI. Nie ma opcji danych do skonfigurowania; wszystkie ustawienia są zarządzane w opcjach po konfiguracji."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Dozwolona jest tylko jedna instancja Mirage UI."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Ustawienia Mirage UI",
+        "data": {
+          "accent_color": "Kolor Akcentu",
+          "border_radius": "Promień Narożnika",
+          "border_width": "Szerokość Ramki",
+          "separator_width": "Szerokość Separatora",
+          "card_text_color_mode": "Kolor Tekstu Karty",
+          "glass_blur": "Szkło: Intensywność Rozmycia",
+          "glass_transparency": "Szkło: Przezroczystość",
+          "solid_bg_color_dark": "Pełny: Tło (Ciemny)",
+          "solid_bg_color_light": "Pełny: Tło (Jasny)",
+          "paper_bg_color_dark": "Papier: Tło (Ciemny)",
+          "paper_bg_color_light": "Papier: Tło (Jasny)",
+          "floating_bg_color_dark": "Pływający: Tło (Ciemny)",
+          "floating_bg_color_light": "Pływający: Tło (Jasny)",
+          "floating_opacity": "Pływający: Nieprzezroczystość",
+          "bg_color_dark": "Tło Strony (Ciemny)",
+          "bg_color_light": "Tło Strony (Jasny)",
+          "temperature_color": "Kolor Temperatury",
+          "weather_color": "Kolor Pogody",
+          "humidity_color": "Kolor Wilgotności",
+          "door_color": "Kolor Drzwi",
+          "dark_primary_text_color": "Główny Kolor Tekstu (Ciemny)",
+          "dark_secondary_text_color": "Drugorzędny Kolor Tekstu (Ciemny)",
+          "light_primary_text_color": "Główny Kolor Tekstu (Jasny)",
+          "light_secondary_text_color": "Drugorzędny Kolor Tekstu (Jasny)"
+        },
+        "data_description": {
+          "temperature_color": "Pozostaw puste, aby użyć koloru akcentu.",
+          "weather_color": "Pozostaw puste, aby użyć koloru akcentu.",
+          "humidity_color": "Pozostaw puste, aby użyć koloru akcentu.",
+          "door_color": "Pozostaw puste, aby użyć koloru akcentu."
+        }
+      }
+    }
+  },
+  "selector": {
+    "card_text_color_mode": {
+      "options": {
+        "auto": "Auto (Jasny przy ciemnym motywie, Ciemny przy jasnym motywie)",
+        "light": "Jasny (Dla ciemnych teł kart)",
+        "dark": "Ciemny (Dla jasnych teł kart)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Zastosuj ustawienie wstępne",
+      "description": "Stosuje zapisane ustawienie wstępne Mirage UI do globalnych ustawień motywu.",
+      "fields": {
+        "preset_name": {
+          "name": "Nazwa ustawienia wstępnego",
+          "description": "Nazwa niestandardowego ustawienia wstępnego do zastosowania."
+        }
+      }
+    }
+  }
+}

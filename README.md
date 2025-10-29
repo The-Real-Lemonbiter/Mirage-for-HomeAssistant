@@ -1,29 +1,31 @@
 # Mirage UI für Home Assistant
 
-Mirage UI ist eine elegante, moderne und umfassend konfigurierbare Benutzeroberfläche für Home Assistant. Es ist ein komplettes UI-System, das verschiedene Karten-Stile (`Glas`, `Deckend`, `Papier` und `Schwebend`) bietet, um dir ein intuitives und personalisiertes Erlebnis zur Steuerung deines Smart Homes zu ermöglichen.
+**Träumst du von einem Smart-Home-Dashboard, das nicht nur intelligent, sondern auch atemberaubend ist?**
 
-Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwendige mitbringt:
-- Ein dynamisches **Mirage Theme** (im hellen und dunklen Modus).
-- Eine vielseitige **Mirage Card** zur Anzeige deiner Geräte.
-- Eine benutzerfreundliche **Konfigurations-Oberfläche** direkt in Home Assistant, mit der du das globale Aussehen anpassen kannst.
+Der Weg zu einer perfekten Oberfläche in Home Assistant kann komplex sein – Themes, Karten und Konfigurationen müssen oft mühsam aufeinander abgestimmt werden.
+
+**Hier kommt Mirage UI ins Spiel.**
+
+Mirage UI ist nicht nur ein weiteres Theme, sondern ein **komplettes, einheitliches Design-System**, das Schönheit und Einfachheit vereint. Es wurde entwickelt, um dir die volle Kontrolle über das Aussehen deines Dashboards zu geben, ohne dass du tief in YAML-Code eintauchen musst. Verwandle dein Dashboard von einer reinen Schaltzentrale in ein persönliches Meisterwerk.
 
 ---
 
 ## Features
 
+- **Live-Einstellungs-Panel**: Konfiguriere dein gesamtes Theme über ein interaktives Panel mit **Live-Vorschau** – direkt in den Home Assistant Einstellungen. Kein Raten, kein YAML-Gefummel mehr.
+- **Automatischer Tag- & Nachtmodus**: Konfiguriere separate Designs für helle und dunkle Umgebungen. Mirage UI wechselt automatisch mit dem Sonnenstand von Home Assistant.
+- **Mehrsprachige Unterstützung**: Die Benutzeroberfläche ist in Englisch, Deutsch, Französisch, Niederländisch, Spanisch, Italienisch, Polnisch und Portugiesisch verfügbar.
 - **Zwei Styling-Modi**:
     1.  **Globales Theme**: Einmal einstellen, überall anwenden. Perfekt für ein einheitliches Design.
     2.  **Individuelles Karten-Styling**: Überschreibe das globale Theme für einzelne Karten, um bestimmte Geräte oder Bereiche hervorzuheben.
 - **Verschiedene Karten-Stile**: Wähle zwischen `Glas`, `Deckend`, `Papier` und `Schwebend`.
-- **Umfassende Anpassung**: Passe Farben, Ränder, Radien, Unschärfe und mehr über ein Live-Vorschau-Panel an.
-- **Dynamische Textfarben**: Text und Icons auf interaktiven Elementen passen sich automatisch an, um bei jeder Akzentfarbe lesbar zu bleiben.
-- **Intelligenter Visueller Editor**: Der Editor zeigt dir jetzt die globalen Werte als Platzhalter an, damit du genau siehst, welche Einstellungen du für eine einzelne Karte überschreibst.
+- **Hintergrundbild-Upload**: Lade ganz einfach unterschiedliche Hintergrundbilder für deinen Tag- und Nachtmodus hoch.
 - **Vorgaben-System**: Speichere, lade und teile deine Designs mühelos.
 - **Import & Export**: Sichere deine Einstellungen oder teile sie mit der Community.
-- **Eigene Hintergründe**: Lade unterschiedliche Hintergrundbilder für dein helles und dunkles Theme hoch.
+- **Intelligenter Visueller Editor**: Der Karten-Editor zeigt dir die globalen Werte als Platzhalter an, damit du genau siehst, welche Einstellungen du überschreibst.
 - **Deaktivierbare Animationen**: Schalte alle UI-Animationen mit einem Klick aus.
 - **Benutzerdefinierter Service**: Wechsle dein Theme dynamisch über Automationen mit dem `mirage.apply_preset` Service.
-- **Diagnose-Tool**: Lade mit einem Klick einen Bericht deiner aktuellen Theme-Einstellungen herunter, um bei Problemen einfach Hilfe zu bekommen.
+- **Diagnose-Tool**: Lade mit einem Klick einen Bericht deiner aktuellen Theme-Einstellungen herunter.
 
 ---
 
@@ -36,12 +38,12 @@ Mirage UI bietet dir das Beste aus beiden Welten: Einfachheit und Kontrolle.
     *   Nach der Installation fügst du die Integration unter `Einstellungen > Geräte & Dienste` hinzu.
 
 2.  **Zentrales Konfigurations-Panel (für das globale Theme)**:
-    *   Das globale Erscheinungsbild wird **ausschließlich** auf der Konfigurationsseite der Integration angepasst. Diese Einstellungen gelten für dein gesamtes Home Assistant.
-    *   Deine Einstellungen werden als globale CSS-Variablen bereitgestellt.
+    *   Das globale Erscheinungsbild wird **ausschließlich** im interaktiven Einstellungs-Panel der Integration angepasst. Klicke einfach auf `Konfigurieren`, um die Live-Vorschau zu öffnen.
+    *   Deine Einstellungen werden als globale CSS-Variablen bereitgestellt, die von allen Mirage Cards genutzt werden.
 
 3.  **Die Mirage Card (flexibel & anpassungsfähig)**:
-    *   **Standardmäßig** übernimmt die Karte automatisch das globale Theme. Du musst nichts weiter tun.
-    *   **Optional** kannst du jeder Karte ein eigenes `theme`-Objekt in der YAML-Konfiguration mitgeben oder den visuellen Editor verwenden, um sie individuell zu gestalten. Diese lokalen Einstellungen überschreiben dann das globale Theme nur für diese eine Karte.
+    *   **Standardmäßig** übernimmt die Karte automatisch das globale Theme.
+    *   **Optional** kannst du jeder Karte ein eigenes `theme`-Objekt in der YAML-Konfiguration mitgeben oder den visuellen Editor verwenden, um sie individuell zu gestalten.
 
 ---
 
@@ -62,7 +64,7 @@ Mirage UI bietet dir das Beste aus beiden Welten: Einfachheit und Kontrolle.
 
 ### 1. Aktiviere das globale Theme
 1.  Gehe zu deinem **Benutzerprofil** (klicke auf deinen Namen in der Seitenleiste).
-2.  Wähle unter **Theme** entweder `Mirage Dark` oder `Mirage Light` aus.
+2.  Wähle unter **Theme** die Option `Automatisch`. Mirage UI kümmert sich um den Rest.
 
 ### 2. Nutze die Karte
 
@@ -91,10 +93,10 @@ theme:
 
 ### 3. Passe das globale Theme an
 Um die systemweiten Standardeinstellungen zu ändern, gehe zur Konfigurationsseite der Integration:
-**Einstellungen > Geräte & Dienste > Mirage UI > Konfigurieren**.
+**Einstellungen > Geräte & Dienste > Mirage UI > Konfigurieren**. Hier öffnet sich das Live-Einstellungs-Panel.
 
 ### 4. Nutze den Service in Automationen
-Du kannst das globale Mirage Theme dynamisch ändern. Das ist nützlich, um die Atmosphäre deines Dashboards basierend auf Ereignissen anzupassen.
+Du kannst das globale Mirage Theme dynamisch ändern. Das ist nützlich, um die Atmosphäre deines Dashboards basierend auf Ereignissen anzupassen. Die Vorgaben werden dabei auf dem Server gespeichert, sodass Automationen zuverlässig darauf zugreifen können.
 
 **Beispiel:** Wechsle zum Preset "Movie Time", wenn dein Fernseher eingeschaltet wird.
 ```yaml
@@ -109,7 +111,6 @@ automation:
         data:
           preset_name: "Movie Time"
 ```
-**Wichtiger Hinweis**: Aktuell werden deine Presets im Browser gespeichert. Dieser Service ist daher ein Platzhalter für zukünftige Versionen, in denen Presets zentral verwaltet werden. Momentan protokolliert er den Aufruf nur im Home Assistant Log, damit du deine Automationen schon vorbereiten kannst.
 
 Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
@@ -118,30 +119,32 @@ Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
 # Mirage UI for Home Assistant (English)
 
-Mirage UI is a sleek, modern, and highly configurable user interface for Home Assistant. It's a complete UI system featuring multiple distinct card styles (like `Glass`, `Solid`, `Paper`, and `Floating`) to provide an intuitive and personalized experience for controlling your smart home.
+**Ever dreamed of a smart home dashboard that's not just smart, but absolutely stunning?**
 
-This package is a single, unified **integration** that provides:
-- A dynamic **Mirage Theme** (in dark and light modes).
-- A versatile **Mirage Card** for displaying your entities.
-- A user-friendly **Configuration UI** within Home Assistant to customize the global appearance.
+The path to a perfect UI in Home Assistant can be complex, often requiring you to juggle separate themes, cards, and configurations to get everything just right.
+
+**This is where Mirage UI comes in.**
+
+Mirage UI isn't just another theme; it's a **complete, unified design system** that brings beauty and simplicity together. It’s built from the ground up to give you full control over your dashboard's appearance, without needing a deep dive into YAML. Transform your dashboard from a mere control center into a personal masterpiece.
 
 ---
 
 ## Features
 
+- **Live Settings Panel**: Configure your entire theme using an interactive panel with a **live preview**—directly within your Home Assistant settings. No more guesswork, no more YAML-wrangling.
+- **Automatic Day & Night Mode**: Configure separate designs for light and dark environments. Mirage UI switches automatically based on Home Assistant's sun state.
+- **Multi-Language Support**: The user interface is available in English, German, French, Dutch, Spanish, Italian, Polish, and Portuguese.
 - **Two Styling Modes**:
     1.  **Global Theming**: Set it once, apply it everywhere. Perfect for a consistent design.
     2.  **Per-Card Styling**: Override the global theme for individual cards to highlight specific devices or sections.
 - **Multiple Card Styles**: Choose between styles like `Glass`, `Solid`, `Paper`, and `Floating`.
-- **Deep Customization**: Adjust colors, borders, radius, blur, and more via a live-preview UI panel.
-- **Dynamic Text Colors**: Text and icons on interactive elements automatically adapt to remain readable against any chosen accent color.
-- **Smarter Visual Editor**: The editor now displays global values as placeholders, so you know exactly which settings you're overriding for an individual card.
+- **Background Image Upload**: Easily upload different background images for your day and night modes.
 - **Preset System**: Save, load, and share your designs with ease.
 - **Import & Export**: Back up your settings or share them with the community.
-- **Custom Backgrounds**: Upload different background images for your light and dark themes.
+- **Smarter Visual Editor**: The card editor now displays global values as placeholders, so you know exactly which settings you're overriding.
 - **Toggleable Animations**: Disable all UI animations with a single switch.
 - **Custom Service**: Change your theme dynamically via automations using the `mirage.apply_preset` service.
-- **Diagnostics Tool**: Download a report of your current theme settings with one click to easily get help with any issues.
+- **Diagnostics Tool**: Download a report of your current theme settings with one click.
 
 ---
 
@@ -154,12 +157,12 @@ Mirage UI gives you the best of both worlds: simplicity and control.
     *   After installation, you add the integration under `Settings > Devices & Services`.
 
 2.  **Central Configuration Panel (for Global Theming)**:
-    *   The global look and feel is managed **exclusively** on the integration's configuration page. These settings apply to your entire Home Assistant instance.
-    *   Your settings are provided as global CSS variables.
+    *   The global look and feel is managed **exclusively** in the integration's interactive settings panel. Just click `Configure` to open the live preview UI.
+    *   Your settings are provided as global CSS variables used by all Mirage Cards.
 
 3.  **The Mirage Card (Flexible & Adaptive)**:
-    *   **By default**, the card automatically inherits the global theme. No extra configuration needed.
-    *   **Optionally**, you can give any card its own `theme` object in its YAML config or use the Visual Editor to style it individually. These local settings will override the global theme for that specific card only.
+    *   **By default**, the card automatically inherits the global theme.
+    *   **Optionally**, you can give any card its own `theme` object in its YAML config or use the Visual Editor to style it individually.
 
 ---
 
@@ -180,7 +183,7 @@ Mirage UI gives you the best of both worlds: simplicity and control.
 
 ### 1. Activate the Global Theme
 1.  Navigate to your **User Profile** (click your name in the bottom-left sidebar).
-2.  Under **Theme**, select `Mirage Dark` or `Mirage Light`.
+2.  Under **Theme**, select `Auto`. Mirage UI handles the rest.
 
 ### 2. Use the Card
 
@@ -209,10 +212,10 @@ theme:
 
 ### 3. Customize the Global Theme
 To change the system-wide default settings, go to the integration's configuration page:
-**Settings > Devices & Services > Mirage UI > Configure**.
+**Settings > Devices & Services > Mirage UI > Configure**. This will open the live settings panel.
 
 ### 4. Use the Service in Automations
-You can change the global Mirage theme dynamically. This is useful for adapting your dashboard's atmosphere based on events.
+You can change the global Mirage theme dynamically. This is useful for adapting your dashboard's atmosphere based on events. Presets are stored server-side, so automations can reliably access them.
 
 **Example:** Switch to the "Movie Time" preset when your TV turns on.
 ```yaml
@@ -227,7 +230,6 @@ automation:
         data:
           preset_name: "Movie Time"
 ```
-**Important Note**: Currently, your presets are stored in the browser. This service is therefore a placeholder for future versions where presets will be managed centrally. For now, it only logs the call in the Home Assistant log, allowing you to prepare your automations.
 
 Your changes will apply instantly. Have fun designing!
 

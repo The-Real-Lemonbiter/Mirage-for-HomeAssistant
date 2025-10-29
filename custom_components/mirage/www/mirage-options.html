@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mirage UI Options</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Basic styles to make it look like part of HA */
+        body {
+            margin: 0;
+            background-color: transparent; /* Let HA's background show through */
+            color: var(--primary-text-color);
+            font-family: var(--paper-font-body1_-_font-family);
+        }
+        /* Custom styles for UI components used in SettingsPanel */
+        .upload-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .upload-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .clear-btn {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .clear-btn:hover {
+             background-color: rgba(239, 68, 68, 0.2);
+        }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^0.24.0/dist/index.js",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "recharts": "https://aistudiocdn.com/recharts@^2.12.7/es6/index.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module">
+        // This script block bridges the gap between Home Assistant's frontend and our React app.
+        // It dynamically imports the necessary HA frontend modules.
+        (async () => {
+            try {
+                // These are standard modules provided by the Home Assistant frontend.
+                const { getAuth } = await import('/auth/token.js');
+                const { createConnection } = await import('/hacsfiles/home-assistant-js-websocket/dist/index.js');
+
+                // Make these functions globally available for our ha-connection.ts to use.
+                window.getAuth = getAuth;
+                window.createConnection = createConnection;
+
+                // Now that the HA connection helpers are ready, load our main React application.
+                await import("/mirage_static/index.tsx");
+            } catch (e) {
+                console.error("Failed to load Home Assistant connection modules.", e);
+                const root = document.getElementById('root');
+                if (root) {
+                    root.innerHTML = `<div style="color: red; padding: 16px;">Error: Could not load Home Assistant connection utilities. Make sure you are running a compatible version of Home Assistant.</div>`;
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

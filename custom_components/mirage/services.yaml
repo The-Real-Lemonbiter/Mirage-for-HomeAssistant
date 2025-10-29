@@ -1,10 +1,10 @@
 apply_preset:
-  name: Apply Preset
-  description: Applies a saved Mirage UI preset to the global theme settings.
+  name: '{{ "service.apply_preset.name" }}'
+  description: '{{ "service.apply_preset.description" }}'
   fields:
     preset_name:
-      name: Preset Name
-      description: The name of the custom preset to apply.
+      name: '{{ "service.apply_preset.fields.preset_name.name" }}'
+      description: '{{ "service.apply_preset.fields.preset_name.description" }}'
       required: true
       example: "Movie Time"
       selector:

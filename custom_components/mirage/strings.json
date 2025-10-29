@@ -3,49 +3,49 @@
   "config": {
     "step": {
       "user": {
-        "title": "Mirage UI einrichten",
-        "description": "Hiermit wird die Mirage UI Integration eingerichtet. Es gibt keine Datenoptionen zu konfigurieren, alle Einstellungen werden nach der Einrichtung in den Optionen verwaltet."
+        "title": "Set up Mirage UI",
+        "description": "This will set up the Mirage UI integration. There are no data options to configure; all settings are managed in the options after setup."
       }
     },
     "abort": {
-      "single_instance_allowed": "Nur eine einzige Instanz von Mirage UI ist erlaubt."
+      "single_instance_allowed": "Only a single instance of Mirage UI is allowed."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Mirage UI Einstellungen",
+        "title": "Mirage UI Settings",
         "data": {
-          "accent_color": "Akzentfarbe",
-          "border_radius": "Randradius",
-          "border_width": "Randbreite",
-          "separator_width": "Trennerbreite",
-          "card_text_color_mode": "Karten-Textfarbe",
-          "glass_blur": "Glas: Unschärfe",
-          "glass_transparency": "Glas: Transparenz",
-          "solid_bg_color_dark": "Deckend: Hintergrund (Dunkel)",
-          "solid_bg_color_light": "Deckend: Hintergrund (Hell)",
-          "paper_bg_color_dark": "Papier: Hintergrund (Dunkel)",
-          "paper_bg_color_light": "Papier: Hintergrund (Hell)",
-          "floating_bg_color_dark": "Schwebend: Hintergrund (Dunkel)",
-          "floating_bg_color_light": "Schwebend: Hintergrund (Hell)",
-          "floating_opacity": "Schwebend: Deckkraft",
-          "bg_color_dark": "Seitenhintergrund (Dunkel)",
-          "bg_color_light": "Seitenhintergrund (Hell)",
-          "temperature_color": "Farbe für Temperatur",
-          "weather_color": "Farbe für Wetter",
-          "humidity_color": "Farbe für Feuchtigkeit",
-          "door_color": "Farbe für Tür",
-          "dark_primary_text_color": "Primäre Textfarbe (Dunkel)",
-          "dark_secondary_text_color": "Sekundäre Textfarbe (Dunkel)",
-          "light_primary_text_color": "Primäre Textfarbe (Hell)",
-          "light_secondary_text_color": "Sekundäre Textfarbe (Hell)"
+          "accent_color": "Accent Color",
+          "border_radius": "Border Radius",
+          "border_width": "Border Width",
+          "separator_width": "Separator Width",
+          "card_text_color_mode": "Card Text Color",
+          "glass_blur": "Glass: Blur Intensity",
+          "glass_transparency": "Glass: Transparency",
+          "solid_bg_color_dark": "Solid: Background (Dark)",
+          "solid_bg_color_light": "Solid: Background (Light)",
+          "paper_bg_color_dark": "Paper: Background (Dark)",
+          "paper_bg_color_light": "Paper: Background (Light)",
+          "floating_bg_color_dark": "Floating: Background (Dark)",
+          "floating_bg_color_light": "Floating: Background (Light)",
+          "floating_opacity": "Floating: Opacity",
+          "bg_color_dark": "Page Background (Dark)",
+          "bg_color_light": "Page Background (Light)",
+          "temperature_color": "Temperature Color",
+          "weather_color": "Weather Color",
+          "humidity_color": "Humidity Color",
+          "door_color": "Door Color",
+          "dark_primary_text_color": "Primary Text Color (Dark)",
+          "dark_secondary_text_color": "Secondary Text Color (Dark)",
+          "light_primary_text_color": "Primary Text Color (Light)",
+          "light_secondary_text_color": "Secondary Text Color (Light)"
         },
         "data_description": {
-          "temperature_color": "Leer lassen, um die Akzentfarbe zu verwenden.",
-          "weather_color": "Leer lassen, um die Akzentfarbe zu verwenden.",
-          "humidity_color": "Leer lassen, um die Akzentfarbe zu verwenden.",
-          "door_color": "Leer lassen, um die Akzentfarbe zu verwenden."
+          "temperature_color": "Leave empty to use the accent color.",
+          "weather_color": "Leave empty to use the accent color.",
+          "humidity_color": "Leave empty to use the accent color.",
+          "door_color": "Leave empty to use the accent color."
         }
       }
     }
@@ -53,9 +53,21 @@
   "selector": {
     "card_text_color_mode": {
       "options": {
-        "auto": "Auto (Hell bei dunklem Theme, Dunkel bei hellem Theme)",
-        "light": "Hell (Für dunkle Kartenhintergründe)",
-        "dark": "Dunkel (Für helle Kartenhintergründe)"
+        "auto": "Auto (Light on dark theme, Dark on light theme)",
+        "light": "Light (For dark card backgrounds)",
+        "dark": "Dark (For light card backgrounds)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Apply Preset",
+      "description": "Applies a saved Mirage UI preset to the global theme settings.",
+      "fields": {
+        "preset_name": {
+          "name": "Preset Name",
+          "description": "The name of the custom preset to apply."
+        }
       }
     }
   }

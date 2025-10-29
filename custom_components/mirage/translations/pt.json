@@ -1,0 +1,74 @@
+
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar Mirage UI",
+        "description": "Isto irá configurar a integração Mirage UI. Não existem opções de dados para configurar; todas as definições são geridas nas opções após a configuração."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Apenas é permitida uma única instância do Mirage UI."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Definições do Mirage UI",
+        "data": {
+          "accent_color": "Cor de Destaque",
+          "border_radius": "Raio da Borda",
+          "border_width": "Largura da Borda",
+          "separator_width": "Largura do Separador",
+          "card_text_color_mode": "Cor do Texto do Cartão",
+          "glass_blur": "Vidro: Intensidade do Desfoque",
+          "glass_transparency": "Vidro: Transparência",
+          "solid_bg_color_dark": "Sólido: Fundo (Escuro)",
+          "solid_bg_color_light": "Sólido: Fundo (Claro)",
+          "paper_bg_color_dark": "Papel: Fundo (Escuro)",
+          "paper_bg_color_light": "Papel: Fundo (Claro)",
+          "floating_bg_color_dark": "Flutuante: Fundo (Escuro)",
+          "floating_bg_color_light": "Flutuante: Fundo (Claro)",
+          "floating_opacity": "Flutuante: Opacidade",
+          "bg_color_dark": "Fundo da Página (Escuro)",
+          "bg_color_light": "Fundo da Página (Claro)",
+          "temperature_color": "Cor da Temperatura",
+          "weather_color": "Cor do Tempo",
+          "humidity_color": "Cor da Humidade",
+          "door_color": "Cor da Porta",
+          "dark_primary_text_color": "Cor do Texto Principal (Escuro)",
+          "dark_secondary_text_color": "Cor do Texto Secundário (Escuro)",
+          "light_primary_text_color": "Cor do Texto Principal (Claro)",
+          "light_secondary_text_color": "Cor do Texto Secundário (Claro)"
+        },
+        "data_description": {
+          "temperature_color": "Deixar em branco para usar a cor de destaque.",
+          "weather_color": "Deixar em branco para usar a cor de destaque.",
+          "humidity_color": "Deixar em branco para usar a cor de destaque.",
+          "door_color": "Deixar em branco para usar a cor de destaque."
+        }
+      }
+    }
+  },
+  "selector": {
+    "card_text_color_mode": {
+      "options": {
+        "auto": "Auto (Claro em tema escuro, Escuro em tema claro)",
+        "light": "Claro (Para fundos de cartão escuros)",
+        "dark": "Escuro (Para fundos de cartão claros)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Aplicar predefinição",
+      "description": "Aplica uma predefinição guardada do Mirage UI às definições globais do tema.",
+      "fields": {
+        "preset_name": {
+          "name": "Nome da predefinição",
+          "description": "O nome da predefinição personalizada a aplicar."
+        }
+      }
+    }
+  }
+}

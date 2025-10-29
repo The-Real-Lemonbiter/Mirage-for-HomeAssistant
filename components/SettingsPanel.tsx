@@ -12,9 +12,9 @@ import {
     SunIcon, MoonIcon, StyleGlassIcon, StyleSolidIcon, StyleFloatingIcon, StylePaperIcon,
     BlurIcon, ContrastIcon, BorderIcon, BorderRadiusIcon, SeparatorIcon, 
     ColorPaletteIcon, UploadIcon, XIcon, LightbulbIcon, FontIcon, AnimationIcon,
-    SaveIcon, TrashIcon, ExportIcon, ImportIcon, CardStackIcon, TextIcon as CardTextIcon, LanguageIcon
+    SaveIcon, TrashIcon, ExportIcon, ImportIcon, LanguageIcon
 } from './icons';
-import { CardStyle, FontStyle, Preset, CardTextColorMode, SettingsState, Language } from '../types';
+import { SettingsState, EditMode } from '../types';
 
 // A simple row for sliders and toggles where label and control are on the same line.
 const SettingRow: React.FC<{ icon: React.ElementType, label: string, children: React.ReactNode }> = ({ icon: Icon, label, children }) => (
@@ -72,9 +72,9 @@ const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
 const CustomColorInput: React.FC<{
   label: string;
   color: string | null;
-  setColor: (color: string | null) => void;
+  onColorChange: (color: string | null) => void;
   accentColor: string;
-}> = ({ label, color, setColor, accentColor }) => {
+}> = ({ label, color, onColorChange, accentColor }) => {
   const isUsingAccent = color === null;
   return (
     <div className="flex items-center justify-between py-2">
@@ -82,7 +82,7 @@ const CustomColorInput: React.FC<{
         <input
           type="checkbox"
           checked={isUsingAccent}
-          onChange={() => setColor(isUsingAccent ? accentColor : null)}
+          onChange={() => onColorChange(isUsingAccent ? accentColor : null)}
           className="form-checkbox h-4 w-4 rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-500"
         />
         <span className="text-sm text-gray-300">{label}</span>
@@ -90,7 +90,7 @@ const CustomColorInput: React.FC<{
       <input
         type="color"
         value={color || accentColor}
-        onChange={(e) => setColor(e.target.value)}
+        onChange={(e) => onColorChange(e.target.value)}
         disabled={isUsingAccent}
         className={`h-8 w-10 rounded-md ${isUsingAccent ? 'opacity-50 cursor-not-allowed' : ''}`}
       />
@@ -98,7 +98,7 @@ const CustomColorInput: React.FC<{
   );
 };
 
-const TextColorPreview: React.FC<{ mode: CardTextColorMode, theme: 'light' | 'dark', t: (key: string) => string }> = ({ mode, theme, t }) => {
+const TextColorPreview: React.FC<{ mode: 'auto' | 'light' | 'dark', theme: 'light' | 'dark', t: (key: string) => string }> = ({ mode, theme, t }) => {
     const lightColor = { primary: '#e5e7eb', secondary: '#9ca3af' };
     const darkColor = { primary: '#1f2937', secondary: '#4b5563' };
     
@@ -121,36 +121,30 @@ const TextColorPreview: React.FC<{ mode: CardTextColorMode, theme: 'light' | 'da
 };
 
 const SettingsPreview: React.FC = () => {
-    const { 
-      theme, cardStyle, accentColor, t,
-      customBgDark, customBgLight, bgColorDark, bgColorLight 
-    } = useSettings();
+    const { theme, activeThemeConfig, t } = useSettings();
 
     const previewStyle: React.CSSProperties = {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
     };
 
-    const bgImage = theme === 'dark' ? customBgDark : customBgLight;
-    const bgColor = theme === 'dark' ? bgColorDark : bgColorLight;
-
-    if (bgImage) {
-        previewStyle.backgroundImage = `url(${bgImage})`;
+    if (activeThemeConfig.customBg) {
+        previewStyle.backgroundImage = `url(${activeThemeConfig.customBg})`;
     } else {
-        previewStyle.backgroundColor = bgColor;
+        previewStyle.backgroundColor = activeThemeConfig.bgColor;
     }
 
     return (
         <div className="p-4 transition-colors" style={previewStyle}>
              <h3 className="mb-4 text-sm font-medium tracking-wider text-center" style={{color: theme === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)', textShadow: '0 1px 2px rgba(0,0,0,0.2)'}}>{t('livePreview')}</h3>
-            <MirageCard title={t('previewCardTitle')} theme={theme} cardStyle={cardStyle}>
+            <MirageCard title={t('previewCardTitle')} theme={theme} cardStyle={activeThemeConfig.cardStyle}>
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-3">
-                          <LightbulbIcon className="w-6 h-6" style={{color: accentColor}} />
+                          <LightbulbIcon className="w-6 h-6" style={{color: activeThemeConfig.accentColor}} />
                           <span style={{color: 'var(--mirage-card-primary-text-color)'}}>{t('example')}</span>
                         </div>
-                        <ToggleSwitch isOn={true} onToggle={()=>{}} theme={theme} accentColor={accentColor} />
+                        <ToggleSwitch isOn={true} onToggle={()=>{}} theme={theme} accentColor={activeThemeConfig.accentColor} />
                     </div>
                     <p className="text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>
                         {t('previewCardContent')}
@@ -167,24 +161,22 @@ const BackgroundImageControl: React.FC<{
   setCustomBg: (bg: string | null) => void;
   t: (key: string) => string;
 }> = ({ label, customBg, setCustomBg, t }) => {
+  const { uploadBackgroundImage } = useSettings();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
   
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setCustomBg(e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
+      const newUrl = await uploadBackgroundImage(file);
+      if (newUrl) {
+          setCustomBg(newUrl);
+      }
     }
-    if (event.target) event.target.value = '';
+    if (event.target) event.target.value = ''; // Reset file input
   };
 
   return (
@@ -200,8 +192,8 @@ const BackgroundImageControl: React.FC<{
         </button>
       ) : (
         <div className="bg-gray-700/50 rounded-md p-2 flex items-center justify-between">
-          <p className="text-sm text-gray-400 truncate font-mono" title={customBg.startsWith('data:image') ? t('localImageSelected') : customBg}>
-            {t('localImageSelected')}
+          <p className="text-sm text-gray-400 truncate font-mono" title={customBg}>
+            {customBg.split('/').pop()}
           </p>
           <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
             <button onClick={handleUploadClick} className="upload-btn !py-1 !px-2 text-xs">{t('change')}</button>
@@ -214,10 +206,9 @@ const BackgroundImageControl: React.FC<{
 };
 
 const PresetsManager: React.FC = () => {
-    const settings = useSettings();
-    const { presets, applyPreset, savePreset, deletePreset, t } = settings;
+    const { settings, presets, applyPreset, savePreset, deletePreset, t } = useSettings();
     
-    const [selectedPresetKey, setSelectedPresetKey] = useState<string>(presets[0]?.key || '');
+    const [selectedPresetKey, setSelectedPresetKey] = useState<string>('mirage_default');
     const [newPresetName, setNewPresetName] = useState('');
     const [prePresetState, setPrePresetState] = useState<Partial<SettingsState> | null>(null);
 
@@ -230,16 +221,8 @@ const PresetsManager: React.FC = () => {
 
         if (preset) {
             if (!prePresetState) {
-                const {
-                    presets: _p, applyPreset: _ap, savePreset: _sp, deletePreset: _dp, exportSettings: _es, 
-                    importSettings: _is, resetSettings: _rs, currentTextColors: _ctc, t: _t, ...currentState
-                } = settings;
-                Object.keys(currentState).forEach(key => {
-                  if (key.startsWith('set')) delete (currentState as any)[key];
-                });
-                setPrePresetState(currentState as Partial<SettingsState>);
+                setPrePresetState(JSON.parse(JSON.stringify(settings)));
             }
-            
             applyPreset(preset);
             setSelectedPresetKey(presetKey);
         }
@@ -249,7 +232,7 @@ const PresetsManager: React.FC = () => {
         if (prePresetState) {
             applyPreset({ key: 'reverted', name: 'Reverted State', settings: prePresetState });
             setPrePresetState(null);
-            setSelectedPresetKey(presets[0]?.key || '');
+            setSelectedPresetKey('mirage_default');
         }
     };
     
@@ -311,185 +294,228 @@ const PresetsManager: React.FC = () => {
     );
 };
 
-export const SettingsPanel: React.FC<{ isOpen: boolean; onClose: () => void; }> = ({ isOpen, onClose }) => {
-    const settings = useSettings();
-    const { t, language, setLanguage } = settings;
 
+const ThemeSettings: React.FC<{ mode: EditMode }> = ({ mode }) => {
+    const { settings, t, updateActiveThemeConfig, theme } = useSettings();
+    const config = settings![mode];
+    
     const sliderClass = "w-32 accent-blue-500";
     const sliderValueClass = "text-sm text-gray-300 font-mono w-12 text-right";
 
     return (
+        <>
+            <SectionHeader title={t('cardStyle')}/>
+            <div className="grid grid-cols-4 gap-2">
+                <StyleButton label={t('glass')} icon={StyleGlassIcon} isActive={config.cardStyle === 'glass'} onClick={() => updateActiveThemeConfig('cardStyle', 'glass')} />
+                <StyleButton label={t('solid')} icon={StyleSolidIcon} isActive={config.cardStyle === 'solid'} onClick={() => updateActiveThemeConfig('cardStyle', 'solid')} />
+                <StyleButton label={t('paper')} icon={StylePaperIcon} isActive={config.cardStyle === 'paper'} onClick={() => updateActiveThemeConfig('cardStyle', 'paper')} />
+                <StyleButton label={t('floating')} icon={StyleFloatingIcon} isActive={config.cardStyle === 'floating'} onClick={() => updateActiveThemeConfig('cardStyle', 'floating')} />
+            </div>
+            
+            {config.cardStyle === 'glass' && (
+                <div className="mt-2 bg-black/20 p-2 rounded-lg">
+                    <SettingRow icon={BlurIcon} label={t('blurIntensity')}><input type="range" className={sliderClass} min="0" max="40" value={config.blurIntensity} onChange={(e) => updateActiveThemeConfig('blurIntensity', Number(e.target.value))} /><span className={sliderValueClass}>{config.blurIntensity}px</span></SettingRow>
+                    <SettingRow icon={ContrastIcon} label={t('transparency')}><input type="range" className={sliderClass} min="0" max="100" value={config.transparency} onChange={(e) => updateActiveThemeConfig('transparency', Number(e.target.value))} /><span className={sliderValueClass}>{config.transparency}%</span></SettingRow>
+                </div>
+            )}
+            {config.cardStyle === 'solid' && (
+                    <div className="mt-2 bg-black/20 p-2 rounded-lg">
+                    <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
+                        <input type="color" value={config.solidColor} onChange={(e) => updateActiveThemeConfig('solidColor', e.target.value)} className="h-8 w-10 rounded-md" />
+                    </SettingRow>
+                </div>
+            )}
+            {config.cardStyle === 'paper' && (
+                    <div className="mt-2 bg-black/20 p-2 rounded-lg">
+                    <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
+                        <input type="color" value={config.paperColor} onChange={(e) => updateActiveThemeConfig('paperColor', e.target.value)} className="h-8 w-10 rounded-md" />
+                    </SettingRow>
+                </div>
+            )}
+            {config.cardStyle === 'floating' && (
+                    <div className="mt-2 bg-black/20 p-2 rounded-lg">
+                    <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}><input type="color" value={config.floatingColor} onChange={(e) => updateActiveThemeConfig('floatingColor', e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
+                    <SettingRow icon={ContrastIcon} label={t('opacity')}><input type="range" className={sliderClass} min="0" max="100" value={config.floatingOpacity} onChange={(e) => updateActiveThemeConfig('floatingOpacity', Number(e.target.value))} /><span className={sliderValueClass}>{config.floatingOpacity}%</span></SettingRow>
+                </div>
+            )}
+            
+            <SectionHeader title={t('appearance')}/>
+                <div className="bg-black/20 p-2 rounded-lg divide-y divide-white/5">
+                <SettingRow icon={BorderRadiusIcon} label={t('borderRadius')}><input type="range" className={sliderClass} min="0" max="32" value={config.borderRadius} onChange={(e) => updateActiveThemeConfig('borderRadius', Number(e.target.value))} /><span className={sliderValueClass}>{config.borderRadius}px</span></SettingRow>
+                <SettingRow icon={BorderIcon} label={t('borderWidth')}><input type="range" className={sliderClass} min="0" max="4" step="0.5" value={config.borderThickness} onChange={(e) => updateActiveThemeConfig('borderThickness', Number(e.target.value))} /><span className={sliderValueClass}>{config.borderThickness}px</span></SettingRow>
+                <SettingRow icon={SeparatorIcon} label={t('separatorWidth')}><input type="range" className={sliderClass} min="0" max="4" step="0.5" value={config.separatorThickness} onChange={(e) => updateActiveThemeConfig('separatorThickness', Number(e.target.value))} /><span className={sliderValueClass}>{config.separatorThickness}px</span></SettingRow>
+                <VerticalSetting icon={ContrastIcon} label={t('cardTextColor')}>
+                    <TextColorPreview mode={config.cardTextColorMode} theme={theme} t={t} />
+                    <div className="flex-1 flex items-center p-1 rounded-md bg-white/5">
+                        <SegmentedControlButton onClick={() => updateActiveThemeConfig('cardTextColorMode', 'auto')} isActive={config.cardTextColorMode === 'auto'}>{t('auto')}</SegmentedControlButton>
+                        <SegmentedControlButton onClick={() => updateActiveThemeConfig('cardTextColorMode', 'light')} isActive={config.cardTextColorMode === 'light'}>{t('light')}</SegmentedControlButton>
+                        <SegmentedControlButton onClick={() => updateActiveThemeConfig('cardTextColorMode', 'dark')} isActive={config.cardTextColorMode === 'dark'}>{t('dark')}</SegmentedControlButton>
+                    </div>
+                </VerticalSetting>
+            </div>
+            
+            <SectionHeader title={t('colors')}/>
+            <div className="bg-black/20 p-2 rounded-lg">
+                <SettingRow icon={ColorPaletteIcon} label={t('accentColor')}><input type="color" value={config.accentColor} onChange={(e) => updateActiveThemeConfig('accentColor', e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
+                <CustomColorInput label={t('temperature')} color={config.temperatureColor} onColorChange={(c) => updateActiveThemeConfig('temperatureColor', c)} accentColor={config.accentColor} />
+                <CustomColorInput label={t('weather')} color={config.weatherColor} onColorChange={(c) => updateActiveThemeConfig('weatherColor', c)} accentColor={config.accentColor} />
+                <CustomColorInput label={t('humidity')} color={config.humidityColor} onColorChange={(c) => updateActiveThemeConfig('humidityColor', c)} accentColor={config.accentColor} />
+                <CustomColorInput label={t('door')} color={config.doorColor} onColorChange={(c) => updateActiveThemeConfig('doorColor', c)} accentColor={config.accentColor} />
+            </div>
+
+            <SectionHeader title={t('pageBackground')}/>
+                <div className="bg-black/20 p-4 rounded-lg space-y-4">
+                <BackgroundImageControl label={t('backgroundImage')} customBg={config.customBg} setCustomBg={(c) => updateActiveThemeConfig('customBg', c)} t={t} />
+                <SettingRow icon={ColorPaletteIcon} label={t('backgroundColor')}>
+                    <input type="color" value={config.bgColor} onChange={(e) => updateActiveThemeConfig('bgColor', e.target.value)} className="h-8 w-10 rounded-md" />
+                </SettingRow>
+                <p className="text-xs text-gray-500 pt-2 text-center">{t('bgNote')}</p>
+            </div>
+        </>
+    );
+};
+
+interface SettingsPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  isHaIntegration?: boolean;
+}
+
+export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, isHaIntegration = false }) => {
+    const { t, settings, updateGeneralSetting, resetSettings, exportSettings, importSettings, activeEditMode, setActiveEditMode, setTheme, saveSettingsToHA, haLanguage, setHaLanguage } = useSettings();
+    const [activeTab, setActiveTab] = useState<'day' | 'night' | 'general'>('night');
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+    
+    const handleTabClick = (tab: 'day' | 'night' | 'general') => {
+        setActiveTab(tab);
+        if (tab === 'day') {
+            setActiveEditMode('day');
+            setTheme('light');
+        } else if (tab === 'night') {
+            setActiveEditMode('night');
+            setTheme('dark');
+        }
+    };
+
+    const handleSave = async () => {
+        setSaveStatus('saving');
+        await saveSettingsToHA();
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+    };
+    
+    if (!settings) return null; // Or a loading spinner
+
+    const panelContent = (
+      <div
+          className={`h-full bg-[#1e2128] text-gray-200 shadow-2xl flex flex-col`}
+      >
+          <header className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
+              <h2 className="text-lg font-semibold">{t('configTitle')}</h2>
+              {!isHaIntegration && (
+                <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+                    <XIcon className="w-5 h-5"/>
+                </button>
+              )}
+          </header>
+          
+          <SettingsPreview />
+          
+          <nav className="flex items-center p-1 mx-4 mt-4 rounded-lg bg-black/20 flex-shrink-0">
+              <button onClick={() => handleTabClick('day')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'day' ? 'bg-gray-200 text-black font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('dayTab')}</button>
+              <button onClick={() => handleTabClick('night')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'night' ? 'bg-gray-600 text-white font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('nightTab')}</button>
+              <button onClick={() => handleTabClick('general')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'general' ? 'bg-gray-400 text-black font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('generalTab')}</button>
+          </nav>
+
+          <div className="p-4 overflow-y-auto flex-grow">
+              {activeTab === 'day' && <ThemeSettings mode="day" />}
+              {activeTab === 'night' && <ThemeSettings mode="night" />}
+
+              {activeTab === 'general' && (
+                  <>
+                      <SectionHeader title={t('presets')}/>
+                      <PresetsManager />
+
+                      <SectionHeader title={t('appearance')} />
+                      <div className="bg-black/20 p-2 rounded-lg divide-y divide-white/5">
+                          <VerticalSetting icon={FontIcon} label={t('fontStyle')}>
+                              <div className="w-full flex items-center p-1 rounded-md bg-white/5">
+                                  <SegmentedControlButton onClick={() => updateGeneralSetting('font', 'system')} isActive={settings.general.font === 'system'}>{t('system')}</SegmentedControlButton>
+                                  <SegmentedControlButton onClick={() => updateGeneralSetting('font', 'serif')} isActive={settings.general.font === 'serif'}>{t('serif')}</SegmentedControlButton>
+                                  <SegmentedControlButton onClick={() => updateGeneralSetting('font', 'monospace')} isActive={settings.general.font === 'monospace'}>{t('mono')}</SegmentedControlButton>
+                              </div>
+                          </VerticalSetting>
+                          <SettingRow icon={AnimationIcon} label={t('animations')}><ToggleSwitch isOn={settings.general.animationsEnabled} onToggle={() => updateGeneralSetting('animationsEnabled', !settings.general.animationsEnabled)} theme={useSettings().theme} accentColor={settings.night.accentColor} /></SettingRow>
+                          {!isHaIntegration && (
+                            <SettingRow icon={LanguageIcon} label={t('language')}>
+                                <select
+                                    value={haLanguage}
+                                    onChange={(e) => setHaLanguage(e.target.value)}
+                                    className="bg-gray-700 border-gray-600 rounded-md text-sm py-1 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="en">English</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="fr">Français</option>
+                                    <option value="nl">Nederlands</option>
+                                    <option value="es">Español</option>
+                                    <option value="it">Italiano</option>
+                                    <option value="pl">Polski</option>
+                                    <option value="pt">Português</option>
+                                </select>
+                            </SettingRow>
+                          )}
+                      </div>
+
+                      <SectionHeader title={t('advanced')} />
+                      <div className="bg-black/20 p-2 rounded-lg flex items-center justify-center space-x-4">
+                          <button onClick={() => { navigator.clipboard.writeText(exportSettings()); alert(t('settingsCopied')); }} className="flex items-center space-x-2 upload-btn">
+                              <ExportIcon className="w-5 h-5" /><span>{t('export')}</span>
+                          </button>
+                          <button onClick={() => {
+                              const data = prompt(t('pasteSettingsPrompt'));
+                              if (data) { if (!importSettings(data)) { alert(t('importError')); } }
+                          }} className="flex items-center space-x-2 upload-btn">
+                              <ImportIcon className="w-5 h-5" /><span>{t('import')}</span>
+                          </button>
+                      </div>
+
+                      <SectionHeader title={t('resetToDefaults')} />
+                      <div className="space-y-2">
+                          <button onClick={() => resetSettings('day')} className="w-full py-2 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-colors text-sm">{t('resetDaySettings')}</button>
+                          <button onClick={() => resetSettings('night')} className="w-full py-2 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-colors text-sm">{t('resetNightSettings')}</button>
+                          <button onClick={() => resetSettings('general')} className="w-full py-2 rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-colors text-sm">{t('resetGeneralSettings')}</button>
+                      </div>
+                  </>
+              )}
+          </div>
+
+          {isHaIntegration && (
+             <footer className="p-4 border-t border-white/10 flex-shrink-0">
+                <button onClick={handleSave} className={`w-full py-2.5 rounded-lg text-white font-semibold transition-colors duration-200 flex items-center justify-center ${
+                    saveStatus === 'saved' ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-500'
+                }`}
+                disabled={saveStatus === 'saving'}
+                >
+                    {saveStatus === 'idle' && t('saveSettings')}
+                    {saveStatus === 'saving' && '...'}
+                    {saveStatus === 'saved' && t('settingsSaved')}
+                </button>
+             </footer>
+          )}
+      </div>
+    );
+    
+    if (isHaIntegration) {
+      return panelContent;
+    }
+
+    return (
         <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${isOpen ? 'bg-black/60' : 'pointer-events-none opacity-0'}`} onClick={onClose}>
             <div
-                className={`fixed top-0 right-0 h-full w-full max-w-sm bg-[#1e2128] text-gray-200 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                className={`fixed top-0 right-0 h-full w-full max-w-sm transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <header className="flex items-center justify-between p-4 border-b border-white/10 flex-shrink-0">
-                    <h2 className="text-lg font-semibold">{t('configTitle')}</h2>
-                    <button onClick={onClose} className="p-1 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
-                        <XIcon className="w-5 h-5"/>
-                    </button>
-                </header>
-                
-                <SettingsPreview />
-
-                <div className="p-4 overflow-y-auto flex-grow">
-                    <SectionHeader title={t('language')} />
-                    <div className="bg-black/20 p-2 rounded-lg">
-                      <SettingRow icon={LanguageIcon} label={t('language')}>
-                          <div className="flex items-center p-1 rounded-md bg-white/5">
-                              <button onClick={() => setLanguage('en')} className={`px-3 py-1 text-sm rounded ${language === 'en' ? 'bg-gray-200 text-black' : 'text-gray-300'}`}>EN</button>
-                              <button onClick={() => setLanguage('de')} className={`px-3 py-1 text-sm rounded ${language === 'de' ? 'bg-gray-200 text-black' : 'text-gray-300'}`}>DE</button>
-                              <button onClick={() => setLanguage('fr')} className={`px-3 py-1 text-sm rounded ${language === 'fr' ? 'bg-gray-200 text-black' : 'text-gray-300'}`}>FR</button>
-                          </div>
-                      </SettingRow>
-                    </div>
-
-                    <SectionHeader title={t('presets')}/>
-                    <PresetsManager />
-
-                    <SectionHeader title={t('theme')}/>
-                    <div className="bg-black/20 p-2 rounded-lg">
-                      <SettingRow icon={settings.theme === 'light' ? SunIcon : MoonIcon} label={t('mode')}>
-                          <div className="flex items-center p-1 rounded-md bg-white/5">
-                              <button onClick={() => settings.setTheme('light')} className={`px-3 py-1 text-sm rounded ${settings.theme === 'light' ? 'bg-gray-200 text-black' : 'text-gray-300'}`}>{t('light')}</button>
-                              <button onClick={() => settings.setTheme('dark')} className={`px-3 py-1 text-sm rounded ${settings.theme === 'dark' ? 'bg-gray-600 text-white' : 'text-gray-300'}`}>{t('dark')}</button>
-                          </div>
-                      </SettingRow>
-                    </div>
-
-                    <SectionHeader title={t('cardStyle')}/>
-                    <div className="grid grid-cols-4 gap-2">
-                        <StyleButton label={t('glass')} icon={StyleGlassIcon} isActive={settings.cardStyle === 'glass'} onClick={() => settings.setCardStyle('glass')} />
-                        <StyleButton label={t('solid')} icon={StyleSolidIcon} isActive={settings.cardStyle === 'solid'} onClick={() => settings.setCardStyle('solid')} />
-                        <StyleButton label={t('paper')} icon={StylePaperIcon} isActive={settings.cardStyle === 'paper'} onClick={() => settings.setCardStyle('paper')} />
-                        <StyleButton label={t('floating')} icon={StyleFloatingIcon} isActive={settings.cardStyle === 'floating'} onClick={() => settings.setCardStyle('floating')} />
-                    </div>
-                    
-                    {settings.cardStyle === 'glass' && (
-                        <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={BlurIcon} label={t('blurIntensity')}><input type="range" className={sliderClass} min="0" max="40" value={settings.blurIntensity} onChange={(e) => settings.setBlurIntensity(Number(e.target.value))} /><span className={sliderValueClass}>{settings.blurIntensity}px</span></SettingRow>
-                            <SettingRow icon={ContrastIcon} label={t('transparency')}><input type="range" className={sliderClass} min="0" max="100" value={settings.transparency} onChange={(e) => settings.setTransparency(Number(e.target.value))} /><span className={sliderValueClass}>{settings.transparency}%</span></SettingRow>
-                        </div>
-                    )}
-                    {settings.cardStyle === 'solid' && (
-                         <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
-                              <input 
-                                type="color" 
-                                value={settings.theme === 'dark' ? settings.solidColorDark : settings.solidColorLight} 
-                                onChange={(e) => settings.theme === 'dark' ? settings.setSolidColorDark(e.target.value) : settings.setSolidColorLight(e.target.value)} 
-                                className="h-8 w-10 rounded-md"
-                              />
-                            </SettingRow>
-                        </div>
-                    )}
-                    {settings.cardStyle === 'paper' && (
-                         <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}>
-                              <input 
-                                type="color" 
-                                value={settings.theme === 'dark' ? settings.paperColorDark : settings.paperColorLight} 
-                                onChange={(e) => settings.theme === 'dark' ? settings.setPaperColorDark(e.target.value) : settings.setPaperColorLight(e.target.value)} 
-                                className="h-8 w-10 rounded-md"
-                              />
-                            </SettingRow>
-                        </div>
-                    )}
-                    {settings.cardStyle === 'floating' && (
-                         <div className="mt-2 bg-black/20 p-2 rounded-lg">
-                            <SettingRow icon={ColorPaletteIcon} label={t('cardColor')}><input type="color" value={settings.theme === 'dark' ? settings.floatingColorDark : settings.floatingColorLight} onChange={(e) => settings.theme === 'dark' ? settings.setFloatingColorDark(e.target.value) : settings.setFloatingColorLight(e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
-                            <SettingRow icon={ContrastIcon} label={t('opacity')}><input type="range" className={sliderClass} min="0" max="100" value={settings.floatingOpacity} onChange={(e) => settings.setFloatingOpacity(Number(e.target.value))} /><span className={sliderValueClass}>{settings.floatingOpacity}%</span></SettingRow>
-                        </div>
-                    )}
-                    
-                    <SectionHeader title={t('appearance')}/>
-                     <div className="bg-black/20 p-2 rounded-lg divide-y divide-white/5">
-                        <SettingRow icon={BorderRadiusIcon} label={t('borderRadius')}><input type="range" className={sliderClass} min="0" max="32" value={settings.borderRadius} onChange={(e) => settings.setBorderRadius(Number(e.target.value))} /><span className={sliderValueClass}>{settings.borderRadius}px</span></SettingRow>
-                        <SettingRow icon={BorderIcon} label={t('borderWidth')}><input type="range" className={sliderClass} min="0" max="4" step="0.5" value={settings.borderThickness} onChange={(e) => settings.setBorderThickness(Number(e.target.value))} /><span className={sliderValueClass}>{settings.borderThickness}px</span></SettingRow>
-                        <SettingRow icon={SeparatorIcon} label={t('separatorWidth')}><input type="range" className={sliderClass} min="0" max="4" step="0.5" value={settings.separatorThickness} onChange={(e) => settings.setSeparatorThickness(Number(e.target.value))} /><span className={sliderValueClass}>{settings.separatorThickness}px</span></SettingRow>
-                        
-                        <VerticalSetting icon={CardTextIcon} label={t('cardTextColor')}>
-                            <TextColorPreview mode={settings.cardTextColorMode} theme={settings.theme} t={t} />
-                            <div className="flex-1 flex items-center p-1 rounded-md bg-white/5">
-                                <SegmentedControlButton onClick={() => settings.setCardTextColorMode('auto')} isActive={settings.cardTextColorMode === 'auto'}>{t('auto')}</SegmentedControlButton>
-                                <SegmentedControlButton onClick={() => settings.setCardTextColorMode('light')} isActive={settings.cardTextColorMode === 'light'}>{t('light')}</SegmentedControlButton>
-                                <SegmentedControlButton onClick={() => settings.setCardTextColorMode('dark')} isActive={settings.cardTextColorMode === 'dark'}>{t('dark')}</SegmentedControlButton>
-                            </div>
-                        </VerticalSetting>
-
-                        <VerticalSetting icon={FontIcon} label={t('fontStyle')}>
-                            <div className="w-full flex items-center p-1 rounded-md bg-white/5">
-                                <SegmentedControlButton onClick={() => settings.setFont('system')} isActive={settings.font === 'system'}>{t('system')}</SegmentedControlButton>
-                                <SegmentedControlButton onClick={() => settings.setFont('serif')} isActive={settings.font === 'serif'}>{t('serif')}</SegmentedControlButton>
-                                <SegmentedControlButton onClick={() => settings.setFont('monospace')} isActive={settings.font === 'monospace'}>{t('mono')}</SegmentedControlButton>
-                            </div>
-                        </VerticalSetting>
-
-                        <SettingRow icon={AnimationIcon} label={t('animations')}><ToggleSwitch isOn={settings.animationsEnabled} onToggle={() => settings.setAnimationsEnabled(!settings.animationsEnabled)} theme={settings.theme as 'dark'|'light'} accentColor={settings.accentColor} /></SettingRow>
-                    </div>
-                    
-                     <SectionHeader title={t('colors')}/>
-                     <div className="bg-black/20 p-2 rounded-lg">
-                        <SettingRow icon={ColorPaletteIcon} label={t('accentColor')}><input type="color" value={settings.accentColor} onChange={(e) => settings.setAccentColor(e.target.value)} className="h-8 w-10 rounded-md" /></SettingRow>
-                        <CustomColorInput label={t('temperature')} color={settings.temperatureColor} setColor={settings.setTemperatureColor} accentColor={settings.accentColor} />
-                        <CustomColorInput label={t('weather')} color={settings.weatherColor} setColor={settings.setWeatherColor} accentColor={settings.accentColor} />
-                        <CustomColorInput label={t('humidity')} color={settings.humidityColor} setColor={settings.setHumidityColor} accentColor={settings.accentColor} />
-                        <CustomColorInput label={t('door')} color={settings.doorColor} setColor={settings.setDoorColor} accentColor={settings.accentColor} />
-                    </div>
-
-                    <SectionHeader title={t('pageBackground')}/>
-                     <div className="bg-black/20 p-4 rounded-lg space-y-4">
-                        <BackgroundImageControl label={t('darkThemePageImage')} customBg={settings.customBgDark} setCustomBg={settings.setCustomBgDark} t={t} />
-                        <SettingRow icon={ColorPaletteIcon} label={t('darkThemePageColor')}>
-                            <input 
-                                type="color" 
-                                value={settings.bgColorDark} 
-                                onChange={(e) => settings.setBgColorDark(e.target.value)} 
-                                className="h-8 w-10 rounded-md"
-                            />
-                        </SettingRow>
-                        <div className="border-t border-white/10 !my-2"></div>
-                        <BackgroundImageControl label={t('lightThemePageImage')} customBg={settings.customBgLight} setCustomBg={settings.setCustomBgLight} t={t} />
-                        <SettingRow icon={ColorPaletteIcon} label={t('lightThemePageColor')}>
-                            <input
-                                type="color"
-                                value={settings.bgColorLight}
-                                onChange={(e) => settings.setBgColorLight(e.target.value)}
-                                className="h-8 w-10 rounded-md"
-                            />
-                        </SettingRow>
-                        <p className="text-xs text-gray-500 pt-2 text-center">{t('bgNote')}</p>
-                    </div>
-
-                    <SectionHeader title={t('advanced')} />
-                    <div className="bg-black/20 p-2 rounded-lg flex items-center justify-center space-x-4">
-                        <button onClick={() => {
-                            navigator.clipboard.writeText(settings.exportSettings());
-                            alert(t('settingsCopied'));
-                        }} className="flex items-center space-x-2 upload-btn">
-                            <ExportIcon className="w-5 h-5" /><span>{t('export')}</span>
-                        </button>
-                         <button onClick={() => {
-                            const data = prompt(t('pasteSettingsPrompt'));
-                            if (data) {
-                                if (!settings.importSettings(data)) {
-                                    alert(t('importError'));
-                                }
-                            }
-                         }} className="flex items-center space-x-2 upload-btn">
-                             <ImportIcon className="w-5 h-5" /><span>{t('import')}</span>
-                         </button>
-                    </div>
-                </div>
-                <footer className="p-4 border-t border-white/10 flex-shrink-0">
-                    <button
-                        onClick={settings.resetSettings}
-                        className="w-full py-2.5 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 hover:text-red-200 transition-colors font-medium"
-                    >
-                        {t('resetToDefaults')}
-                    </button>
-                </footer>
+              {panelContent}
             </div>
         </div>
     );

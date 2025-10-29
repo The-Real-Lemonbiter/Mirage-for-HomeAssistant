@@ -1,0 +1,74 @@
+
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar Mirage UI",
+        "description": "Esto configurará la integración de Mirage UI. No hay opciones de datos para configurar; todos los ajustes se gestionan en las opciones después de la configuración."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Solo se permite una única instancia de Mirage UI."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Ajustes de Mirage UI",
+        "data": {
+          "accent_color": "Color de Acento",
+          "border_radius": "Radio del Borde",
+          "border_width": "Ancho del Borde",
+          "separator_width": "Ancho del Separador",
+          "card_text_color_mode": "Color del Texto de Tarjeta",
+          "glass_blur": "Cristal: Intensidad de Desenfoque",
+          "glass_transparency": "Cristal: Transparencia",
+          "solid_bg_color_dark": "Sólido: Fondo (Oscuro)",
+          "solid_bg_color_light": "Sólido: Fondo (Claro)",
+          "paper_bg_color_dark": "Papel: Fondo (Oscuro)",
+          "paper_bg_color_light": "Papel: Fondo (Claro)",
+          "floating_bg_color_dark": "Flotante: Fondo (Oscuro)",
+          "floating_bg_color_light": "Flotante: Fondo (Claro)",
+          "floating_opacity": "Flotante: Opacidad",
+          "bg_color_dark": "Fondo de Página (Oscuro)",
+          "bg_color_light": "Fondo de Página (Claro)",
+          "temperature_color": "Color de Temperatura",
+          "weather_color": "Color del Clima",
+          "humidity_color": "Color de Humedad",
+          "door_color": "Color de Puerta",
+          "dark_primary_text_color": "Color de Texto Principal (Oscuro)",
+          "dark_secondary_text_color": "Color de Texto Secundario (Oscuro)",
+          "light_primary_text_color": "Color de Texto Principal (Claro)",
+          "light_secondary_text_color": "Color de Texto Secundario (Claro)"
+        },
+        "data_description": {
+          "temperature_color": "Dejar en blanco para usar el color de acento.",
+          "weather_color": "Dejar en blanco para usar el color de acento.",
+          "humidity_color": "Dejar en blanco para usar el color de acento.",
+          "door_color": "Dejar en blanco para usar el color de acento."
+        }
+      }
+    }
+  },
+  "selector": {
+    "card_text_color_mode": {
+      "options": {
+        "auto": "Auto (Claro en tema oscuro, Oscuro en tema claro)",
+        "light": "Claro (Para fondos de tarjeta oscuros)",
+        "dark": "Oscuro (Para fondos de tarjeta claros)"
+      }
+    }
+  },
+  "service": {
+    "apply_preset": {
+      "name": "Aplicar preajuste",
+      "description": "Aplica un preajuste de Mirage UI guardado a la configuración global del tema.",
+      "fields": {
+        "preset_name": {
+          "name": "Nombre del preajuste",
+          "description": "El nombre del preajuste personalizado que se va a aplicar."
+        }
+      }
+    }
+  }
+}

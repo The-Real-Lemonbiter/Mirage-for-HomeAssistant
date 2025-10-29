@@ -6,6 +6,7 @@
  */
 
 import 'react';
+import type { HAConnection } from './ha-connection';
 
 // Fix: Augment React's CSSProperties to allow custom properties which are used for styleOverrides.
 declare module 'react' {
@@ -18,7 +19,7 @@ export type Theme = 'light' | 'dark';
 export type CardStyle = 'glass' | 'solid' | 'floating' | 'paper';
 export type FontStyle = 'system' | 'serif' | 'monospace';
 export type CardTextColorMode = 'auto' | 'light' | 'dark';
-export type Language = 'en' | 'de' | 'fr';
+export type EditMode = 'day' | 'night';
 
 export interface ThermostatDevice {
   id: string;
@@ -33,7 +34,6 @@ export interface SensorDevice {
   name: string;
   value: string;
   icon: 'door' | 'humidity' | 'temperature';
-  history?: { time: string; value: number }[];
 }
 
 export interface MediaDevice {
@@ -43,56 +43,20 @@ export interface MediaDevice {
     albumArt: string;
 }
 
-export interface Scene {
-  id: string;
-  name: string;
-  // Fix: The icon component type should include `style` to match its usage in `App.tsx`.
-  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-}
-
-export interface DimmerLightDevice {
-  id: string;
-  name: string;
-  isOn: boolean;
-  brightness: number;
-}
-
-export interface WeatherData {
-  temperature: number;
-  condition: string;
-  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-}
-
-export interface SystemStatus {
-  cpuTemp: number;
-  memoryUsage: number;
-  storageFree: number;
-  networkStatus: 'online' | 'offline';
-}
-
-export interface NetworkDevice {
-  downloadSpeed: number; // in Mbps
-  uploadSpeed: number; // in Mbps
-}
-
 export interface TextColors {
   primary: string;
   secondary: string;
 }
 
-// Represents the state that can be saved/loaded in a preset
-export interface SettingsState {
-  theme: Theme;
+// Represents theme-specific settings that can differ between day and night.
+export interface ThemeConfig {
   cardStyle: CardStyle;
   transparency: number;
   blurIntensity: number;
-  solidColorDark: string;
-  solidColorLight: string;
-  paperColorDark: string;
-  paperColorLight: string;
+  solidColor: string;
+  paperColor: string;
   floatingOpacity: number;
-  floatingColorDark: string;
-  floatingColorLight: string;
+  floatingColor: string;
   borderThickness: number;
   separatorThickness: number;
   borderRadius: number;
@@ -101,23 +65,35 @@ export interface SettingsState {
   weatherColor: string | null;
   humidityColor: string | null;
   doorColor: string | null;
-  darkThemeTextColors: TextColors;
-  lightThemeTextColors: TextColors;
+  pageTextColor: TextColors;
   cardTextColorMode: CardTextColorMode;
-  bgColorDark: string;
-  bgColorLight: string;
-  customBgDark: string | null;
-  customBgLight: string | null;
+  bgColor: string;
+  customBg: string | null;
+}
+
+// Represents settings that are not theme-dependent.
+export interface GeneralSettings {
   font: FontStyle;
   animationsEnabled: boolean;
-  language: Language;
+}
+
+// The complete state managed by the provider
+export interface SettingsState {
+  day: ThemeConfig;
+  night: ThemeConfig;
+  general: GeneralSettings;
 }
 
 export interface Preset {
   key: string;
   name: string;
   isDefault?: boolean;
-  settings: Partial<SettingsState>;
+  // A preset can contain settings for day, night, or both.
+  settings: {
+    day?: Partial<ThemeConfig>;
+    night?: Partial<ThemeConfig>;
+    general?: Partial<GeneralSettings>;
+  }
 }
 
 export interface MirageCardProps {
@@ -126,46 +102,36 @@ export interface MirageCardProps {
   className?: string;
   theme: Theme;
   cardStyle: CardStyle;
-  styleOverrides?: React.CSSProperties;
 }
 
 
-export interface SettingsContextType extends SettingsState {
+export interface SettingsContextType {
+  // Current state snapshot
+  settings: SettingsState | null; // Can be null until loaded from HA
+  theme: Theme;
   setTheme: (theme: Theme) => void;
-  setCardStyle: (style: CardStyle) => void;
-  setTransparency: (value: number) => void;
-  setBlurIntensity: (value: number) => void;
-  setSolidColorDark: (color: string) => void;
-  setSolidColorLight: (color: string) => void;
-  setPaperColorDark: (color: string) => void;
-  setPaperColorLight: (color: string) => void;
-  setFloatingOpacity: (value: number) => void;
-  setFloatingColorDark: (color: string) => void;
-  setFloatingColorLight: (color: string) => void;
-  setBorderThickness: (value: number) => void;
-  setSeparatorThickness: (value: number) => void;
-  setBorderRadius: (value: number) => void;
-  setAccentColor: (color: string) => void;
-  setTemperatureColor: (color: string | null) => void;
-  setWeatherColor: (color: string | null) => void;
-  setHumidityColor: (color: string | null) => void;
-  setDoorColor: (color: string | null) => void;
-  setDarkThemeTextColors: (colors: TextColors) => void;
-  setLightThemeTextColors: (colors: TextColors) => void;
-  setCardTextColorMode: (mode: CardTextColorMode) => void;
-  setBgColorDark: (color: string) => void;
-  setBgColorLight: (color: string) => void;
-  setCustomBgDark: (bg: string | null) => void;
-  setCustomBgLight: (bg: string | null) => void;
-  setFont: (font: FontStyle) => void;
-  setAnimationsEnabled: (enabled: boolean) => void;
-  setLanguage: (lang: Language) => void;
   
-  resetSettings: () => void;
+  // Edit mode for settings panel
+  activeEditMode: EditMode;
+  setActiveEditMode: (mode: EditMode) => void;
+  
+  // Getters for currently active theme (based on light/dark mode)
+  activeThemeConfig: ThemeConfig;
   currentTextColors: TextColors;
+  
+  // Generic setter for the active theme config
+  updateActiveThemeConfig: (key: keyof ThemeConfig, value: any) => void;
+
+  // Generic setter for general settings
+  updateGeneralSetting: (key: keyof GeneralSettings, value: any) => void;
+  
+  // Actions
+  resetSettings: (mode: 'day' | 'night' | 'general' | 'all') => void;
 
   // Translation function
   t: (key: string, replacements?: { [key: string]: string }) => string;
+  haLanguage: string;
+  setHaLanguage: (lang: string) => void;
 
   // Preset management
   presets: Preset[];
@@ -176,4 +142,9 @@ export interface SettingsContextType extends SettingsState {
   // Import/Export
   exportSettings: () => string;
   importSettings: (settingsString: string) => boolean;
+
+  // HA specific actions
+  saveSettingsToHA: () => Promise<void>;
+  uploadBackgroundImage: (file: File) => Promise<string | null>;
+  haConnection: HAConnection | null;
 }
