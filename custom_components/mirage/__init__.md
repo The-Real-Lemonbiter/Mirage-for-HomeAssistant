@@ -1,4 +1,5 @@
 
+
 """The Mirage UI integration."""
 from __future__ import annotations
 import logging
@@ -171,7 +172,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # This makes files in `custom_components/mirage/www` available at `/mirage_static`.
     static_path_url = "/mirage_static"
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
-    hass.http.register_static_path(static_path_url, static_path_dir, cache_headers=False)
+    hass.http.async_register_static_path(static_path_url, static_path_dir, cache_headers=False)
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
