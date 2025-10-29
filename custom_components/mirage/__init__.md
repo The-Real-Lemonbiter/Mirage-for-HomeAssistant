@@ -1,5 +1,4 @@
 
-
 """The Mirage UI integration."""
 from __future__ import annotations
 import logging
@@ -11,7 +10,6 @@ from typing import Any, Dict
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 import voluptuous as vol
-from homeassistant.components.lovelace import async_register_resource
 
 from .const import DOMAIN
 
@@ -71,7 +69,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
         "mirage-border-width": f"{day_config.get('borderThickness', 1.0)}px",
         "mirage-separator-width": f"{day_config.get('separatorThickness', 1.0)}px",
         "mirage-glass-blur": f"{day_config.get('blurIntensity', 20)}px",
-        "mirage-glass-bg-color-light": f"rgba(240, 242, 240, {glass_alpha_light:.2f})",
+        "mirage-glass-bg-color-light": f"rgba(240, 240, 240, {glass_alpha_light:.2f})",
         "mirage-solid-bg-color-light": day_config.get("solidColor", "#e2e8f0"),
         "mirage-paper-bg-color-light": day_config.get("paperColor", "#ffffff"),
         "mirage-floating-bg-color-light": _hex_to_rgba(day_config.get("floatingColor", "#ffffff"), floating_alpha_light),
@@ -174,6 +172,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     static_path_url = "/mirage_static"
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
     hass.http.async_register_static_path(static_path_url, static_path_dir, cache_headers=False)
+
+    # Late import to prevent blocking calls and ensure dependencies are loaded.
+    from homeassistant.components.lovelace.resources import async_register_resource
 
     # Register the Mirage Card Lovelace resource using the modern helper
     resource_url = f"{static_path_url}/mirage-card.js"
