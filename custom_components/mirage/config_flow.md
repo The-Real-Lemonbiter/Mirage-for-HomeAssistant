@@ -42,6 +42,9 @@ class MirageOptionsFlow(config_entries.OptionsFlow):
     custom frontend panel for configuration. The actual UI is defined in the
     React application located in the /www directory.
     """
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize mirage options flow."""
+        self.config_entry = config_entry
 
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Show a placeholder form, which HA replaces with the custom UI."""
