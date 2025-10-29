@@ -171,7 +171,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # This makes files in `custom_components/mirage/www` available at `/mirage_static`.
     static_path_url = "/mirage_static"
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
-    hass.http.async_register_static_path(static_path_url, static_path_dir, cache_headers=False)
+    hass.http.register_static_path(static_path_url, static_path_dir, cache_headers=False)
 
     # Late import to prevent blocking calls and ensure dependencies are loaded.
     from homeassistant.components.lovelace.resources import async_register_resource
