@@ -359,57 +359,57 @@ const Dashboard: React.FC = () => {
 
           <MirageCard title="System Status" {...mirageCardProps} className="sm:col-span-2 lg:col-span-2">
             <div className="space-y-4">
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><ChipIcon className="w-6 h-6" style={{color: accentColor}}/><span>CPU Temperature</span></div><span className="font-semibold">{systemStatus.cpuTemp.toFixed(1)}°C</span></div>
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><MemoryIcon className="w-6 h-6" style={{color: accentColor}}/><span>Memory Usage</span></div><span className="font-semibold">{systemStatus.memoryUsage.toFixed(1)}%</span></div>
-              <ProgressBar value={systemStatus.memoryUsage} color={accentColor} theme={theme} />
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><StorageIcon className="w-6 h-6" style={{color: accentColor}}/><span>Storage Free</span></div><span className="font-semibold">{systemStatus.storageFree} GB</span></div>
-              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><WifiIcon className="w-6 h-6" style={{color: accentColor}}/><span>Network</span></div><span className={`font-semibold capitalize ${systemStatus.networkStatus === 'online' ? 'text-green-400' : 'text-red-400'}`}>{systemStatus.networkStatus}</span></div>
+              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><ChipIcon className="w-6 h-6" style={{color: accentColor}}/><span>CPU Temperature</span></div><span className="font-mono">{systemStatus.cpuTemp.toFixed(1)}°C</span></div>
+              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><MemoryIcon className="w-6 h-6" style={{color: accentColor}}/><span>Memory Usage</span></div><span className="font-mono">{systemStatus.memoryUsage.toFixed(1)}%</span></div>
+              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><StorageIcon className="w-6 h-6" style={{color: accentColor}}/><span>Storage Free</span></div><span className="font-mono">{systemStatus.storageFree} GB</span></div>
+              <div className="flex items-center justify-between"><div className="flex items-center space-x-3"><WifiIcon className="w-6 h-6" style={{color: accentColor}}/><span>Network</span></div><span className="font-mono capitalize">{systemStatus.networkStatus}</span></div>
             </div>
           </MirageCard>
-          
-          <MirageCard title={dimmer.name} {...mirageCardProps}>
+
+          <MirageCard title="Sensors" {...mirageCardProps}>
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <FanIcon className={`w-6 h-6 ${dimmer.isOn && animationsEnabled ? 'animate-spin' : ''}`} style={{ animationDuration: dimmer.isOn ? `${2.5 - (dimmer.brightness / 100 * 2)}s` : '0s', color: dimmer.isOn ? accentColor : 'var(--mirage-card-secondary-text-color)' }} />
-                  <span>{dimmer.isOn ? `On - ${dimmer.brightness}%` : 'Off'}</span>
-                </div>
-                <ToggleSwitch isOn={dimmer.isOn} onToggle={handleDimmerToggle} theme={theme} accentColor={accentColor} />
-              </div>
-              <div className={`px-2.5 transition-opacity ${!dimmer.isOn ? 'opacity-50' : ''}`}>
-                <input type="range" min="0" max="100" value={dimmer.brightness} onChange={handleBrightnessChange} className="glass-slider" disabled={!dimmer.isOn} />
-              </div>
-            </div>
-          </MirageCard>
-
-          <MirageCard title="Current Weather" {...mirageCardProps}>
-            <div className="flex items-center space-x-4">
-              <weather.icon className="w-16 h-16" style={{color: weatherColor || accentColor}} />
-              <div>
-                <p className="text-4xl font-bold">{weather.temperature}°C</p>
-                <p className="text-lg" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{weather.condition}</p>
-              </div>
+                {sensors.map(sensor => {
+                    let Icon;
+                    let color;
+                    switch (sensor.icon) {
+                        case 'door': Icon = DoorIcon; color = doorColor || accentColor; break;
+                        case 'humidity': Icon = HumidityIcon; color = humidityColor || accentColor; break;
+                        default: Icon = LightbulbIcon; color = accentColor;
+                    }
+                    return (
+                        <div key={sensor.id} className="flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                                <Icon className="w-6 h-6" style={{ color }}/>
+                                <span>{sensor.name}</span>
+                            </div>
+                            <span className="font-medium">{sensor.value}</span>
+                        </div>
+                    );
+                })}
             </div>
           </MirageCard>
           
-          <MirageCard title="Network Speed" {...mirageCardProps} className="sm:col-span-2">
-            <Gauge value={networkSpeed.downloadSpeed} max={150} label="Download" unit="Mbps" color={accentColor} theme={theme} />
-          </MirageCard>
-
-          <MirageCard title="Scenes" {...mirageCardProps} className="sm:col-span-2">
+          <MirageCard title="Scenes" {...mirageCardProps}>
             <div className="grid grid-cols-2 gap-4">
               {scenes.map(scene => {
                 const isActive = activeScene === scene.id;
                 const isHovered = hoveredScene === scene.id;
                 const isHighlighted = isActive || (isHovered && animationsEnabled);
-                const inactiveClasses = theme === 'dark' ? 'bg-white/5' : 'bg-black/5';
                 
-                const buttonStyle: React.CSSProperties = { borderRadius: `${borderRadius}px` };
-                const contentStyle: React.CSSProperties = {};
+                const buttonStyle: React.CSSProperties = {
+                    transition: 'background-color 0.2s, color 0.2s, transform 0.2s'
+                };
+                const iconStyle: React.CSSProperties = { transition: 'color 0.2s' };
+                const textStyle: React.CSSProperties = { transition: 'color 0.2s', color: 'var(--mirage-card-secondary-text-color)' };
                 
                 if (isHighlighted) {
-                    buttonStyle.backgroundColor = hexToRgba(accentColor, theme === 'dark' ? 0.45 : 0.3);
-                    contentStyle.color = getContrastingTextColor(accentColor);
+                    buttonStyle.backgroundColor = hexToRgba(accentColor, 0.2);
+                    iconStyle.color = accentColor;
+                    textStyle.color = accentColor;
+                }
+                
+                if (isActive) {
+                    buttonStyle.transform = 'scale(1.03)';
                 }
 
                 return (
@@ -418,58 +418,77 @@ const Dashboard: React.FC = () => {
                     onClick={() => handleSceneActivation(scene.id)} 
                     onMouseEnter={() => setHoveredScene(scene.id)}
                     onMouseLeave={() => setHoveredScene(null)}
-                    className={`p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-colors ${!isHighlighted ? inactiveClasses : ''}`} 
+                    className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transform`} 
                     style={buttonStyle}
                   >
-                    <scene.icon className="w-8 h-8" style={contentStyle} />
-                    <span className="font-medium" style={contentStyle}>{scene.name}</span>
+                    <scene.icon className="w-8 h-8" style={iconStyle}/>
+                    <span className="text-sm font-semibold" style={textStyle}>{scene.name}</span>
                   </button>
                 )
               })}
             </div>
           </MirageCard>
+
+          <MirageCard title="Weather" {...mirageCardProps}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-5xl font-bold">{weather.temperature}°C</p>
+                <p className="text-lg" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{weather.condition}</p>
+              </div>
+              <weather.icon className={`w-12 h-12`} style={{ color: weatherColor || accentColor, opacity: theme === 'dark' ? 0.8 : 1 }} />
+            </div>
+          </MirageCard>
           
-          <MirageCard 
-            title="Special Card"
-            theme={theme}
-            cardStyle={'paper'} 
-            className="sm:col-span-1"
-            styleOverrides={{
-              '--mirage-accent-color': '#e11d48',
-              '--mirage-card-primary-text-color': '#000000',
-              '--mirage-card-secondary-text-color': '#4b5563',
-              '--mirage-paper-bg-color-light': '#fef2f2',
-              '--mirage-paper-bg-color-dark': '#4c1d24',
-              '--mirage-border-radius': '8px',
-              '--mirage-border-width': '2px',
-              '--mirage-paper-border-color-light': '#fecaca',
-              '--mirage-paper-border-color-dark': '#9f1239',
-            } as React.CSSProperties}
-          >
-             <div className="flex items-center justify-between">
+          <MirageCard title={dimmer.name} {...mirageCardProps}>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                    <ShieldCheckIcon className="w-8 h-8" style={{ color: 'var(--mirage-accent-color)' }}/>
-                    <p className="text-sm">This card has its own style and ignores the global theme.</p>
+                  <FanIcon className={`w-6 h-6 transition-colors`} style={{color: dimmer.isOn ? accentColor : 'var(--mirage-card-secondary-text-color)'}}/>
+                  <span className="transition-colors" style={{color: dimmer.isOn ? accentColor : 'inherit'}}>Fan Power</span>
                 </div>
+                <ToggleSwitch isOn={dimmer.isOn} onToggle={handleDimmerToggle} theme={theme} accentColor={accentColor} />
+              </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>Speed</span>
+                <div className="flex-1">
+                    <div className="relative">
+                       <input 
+                         type="range" 
+                         min="0" 
+                         max="100" 
+                         value={dimmer.brightness} 
+                         onChange={handleBrightnessChange}
+                         className="glass-slider"
+                         disabled={!dimmer.isOn}
+                       />
+                       <div 
+                         className="absolute top-0 left-0 h-1 rounded-full pointer-events-none" 
+                         style={{ width: `${dimmer.brightness}%`, backgroundColor: dimmer.isOn ? accentColor : 'transparent', transition: 'width 0.2s, background-color 0.2s' }}
+                       ></div>
+                    </div>
+                </div>
+                <span className="w-10 text-right font-mono text-sm" style={{color: 'var(--mirage-card-secondary-text-color)'}}>{dimmer.brightness}%</span>
+              </div>
             </div>
           </MirageCard>
 
-          {sensors.map(sensor => (
-            <MirageCard key={sensor.id} title={sensor.name} {...mirageCardProps}>
-                <div className="flex items-center space-x-4">
-                    {sensor.icon === 'door' && <DoorIcon className="w-8 h-8" style={{color: doorColor || accentColor}} />}
-                    {sensor.icon === 'humidity' && <HumidityIcon className="w-8 h-8" style={{color: humidityColor || accentColor}} />}
-                    <p className="text-3xl font-semibold">{sensor.value}</p>
-                </div>
-            </MirageCard>
-          ))}
+          <MirageCard title="Network Speed" {...mirageCardProps} className="sm:col-span-2">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                 <Gauge value={networkSpeed.downloadSpeed} max={150} label="Download" unit="Mbps" color={accentColor} theme={theme}/>
+              </div>
+              <div>
+                 <Gauge value={networkSpeed.uploadSpeed} max={30} label="Upload" unit="Mbps" color={accentColor} theme={theme}/>
+              </div>
+            </div>
+          </MirageCard>
+
         </div>
       </main>
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };
-
 
 const App: React.FC = () => {
   return (
@@ -479,4 +498,5 @@ const App: React.FC = () => {
   );
 };
 
+// Fix: Add default export for the App component.
 export default App;
