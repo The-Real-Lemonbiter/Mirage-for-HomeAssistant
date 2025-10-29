@@ -1,0 +1,11 @@
+apply_preset:
+  name: Apply Preset
+  description: Applies a saved Mirage UI preset to the global theme settings.
+  fields:
+    preset_name:
+      name: Preset Name
+      description: The name of the custom preset to apply.
+      required: true
+      example: "Movie Time"
+      selector:
+        text:

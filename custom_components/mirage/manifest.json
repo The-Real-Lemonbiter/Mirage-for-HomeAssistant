@@ -8,5 +8,6 @@
   "requirements": [],
   "iot_class": "calculated",
   "config_flow": true,
-  "options_flow": true
+  "options_flow": true,
+  "services": true
 }

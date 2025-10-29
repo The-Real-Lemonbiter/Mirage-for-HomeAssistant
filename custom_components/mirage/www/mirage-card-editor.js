@@ -12,11 +12,43 @@ class MirageCardEditor extends LitElement {
         return {
             hass: {},
             _config: {},
+            _globalThemeValues: { state: true },
         };
+    }
+
+    constructor() {
+        super();
+        this._globalThemeValues = {};
+    }
+    
+    connectedCallback() {
+        super.connectedCallback();
+        this._fetchGlobalThemeValues();
     }
 
     setConfig(config) {
         this._config = config;
+    }
+
+    _fetchGlobalThemeValues() {
+        const relevantVars = [
+            '--mirage-accent-color', '--mirage-card-primary-text-color', '--mirage-card-secondary-text-color',
+            '--mirage-border-radius', '--mirage-border-width', '--mirage-separator-width',
+            '--mirage-glass-blur',
+            '--mirage-solid-bg-color-dark', '--mirage-solid-bg-color-light',
+            '--mirage-paper-bg-color-dark', '--mirage-paper-bg-color-light',
+            '--mirage-floating-bg-color-dark', '--mirage-floating-bg-color-light'
+        ];
+        
+        const rootStyle = getComputedStyle(document.documentElement);
+        const newGlobals = {};
+        
+        relevantVars.forEach(varName => {
+            const key = varName.replace('--mirage-', '').replace(/-/g, '_');
+            newGlobals[key] = rootStyle.getPropertyValue(varName).trim();
+        });
+        
+        this._globalThemeValues = newGlobals;
     }
 
     _getThemeValue(key, defaultValue = '') {
@@ -65,8 +97,6 @@ class MirageCardEditor extends LitElement {
         const styleOptions = {
             'glass': [
                 { key: 'glass_blur', label: 'Blur Intensity', type: 'range', min: 0, max: 40, unit: 'px' },
-                { key: 'glass_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
-                { key: 'glass_bg_color_light', label: 'Card Background Color (Light)', type: 'color' },
             ],
             'solid': [
                 { key: 'solid_bg_color_dark', label: 'Card Background Color (Dark)', type: 'color' },
@@ -136,16 +166,28 @@ class MirageCardEditor extends LitElement {
     }
 
     _renderInput(option) {
-        const value = this._getThemeValue(option.key);
+        const isValueSet = this._getThemeValue(option.key, null) !== null;
+        const globalValueRaw = this._globalThemeValues[option.key] || '';
+        const value = this._getThemeValue(option.key, globalValueRaw);
         
+        let cleanValue = String(value);
+        let globalValueClean = String(globalValueRaw);
+
+        if (option.unit) {
+            cleanValue = cleanValue.replace(option.unit, '');
+            globalValueClean = globalValueClean.replace(option.unit, '');
+        }
+
+        const title = !isValueSet ? `Using global setting: ${globalValueRaw}` : 'Using local override';
+
         switch (option.type) {
             case 'color':
                 return html`
                     <div class="row">
-                        <label>${option.label}</label>
+                        <label class="${!isValueSet ? 'is-global-label' : ''}" title="${title}">${option.label}</label>
                         <input
                             type="color"
-                            .value="${value || '#ffffff'}"
+                            .value="${cleanValue || '#ffffff'}"
                             @input="${this._valueChanged}"
                             data-key="${option.key}"
                             data-is-theme="true"
@@ -154,11 +196,12 @@ class MirageCardEditor extends LitElement {
             case 'range':
                 return html`
                     <div class="row">
-                        <label>${option.label}</label>
+                        <label class="${!isValueSet ? 'is-global-label' : ''}" title="${title}">${option.label}</label>
                         <div class="range-container">
                              <input
+                                class="${!isValueSet ? 'is-global-input' : ''}"
                                 type="range"
-                                .value="${value || option.min}"
+                                .value="${cleanValue || option.min}"
                                 min="${option.min}"
                                 max="${option.max}"
                                 step="${option.step || 1}"
@@ -166,7 +209,7 @@ class MirageCardEditor extends LitElement {
                                 data-key="${option.key}"
                                 data-is-theme="true"
                             />
-                            <span>${value || 'auto'}${option.unit}</span>
+                            <span>${cleanValue || 'auto'}${option.unit}</span>
                         </div>
                     </div>`;
             default:
@@ -242,6 +285,17 @@ class MirageCardEditor extends LitElement {
                 font-family: monospace;
                 min-width: 50px;
                 text-align: right;
+                color: var(--secondary-text-color);
+            }
+            .is-global-label {
+                opacity: 0.7;
+                font-style: italic;
+                cursor: help;
+                text-decoration: underline dotted;
+                text-decoration-color: var(--secondary-text-color);
+            }
+            .is-global-input {
+                opacity: 0.7;
             }
         `;
     }

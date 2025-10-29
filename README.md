@@ -16,12 +16,14 @@ Dieses Paket ist eine einzige, vereinheitlichte **Integration**, die alles Notwe
     2.  **Individuelles Karten-Styling**: Überschreibe das globale Theme für einzelne Karten, um bestimmte Geräte oder Bereiche hervorzuheben.
 - **Verschiedene Karten-Stile**: Wähle zwischen `Glas`, `Deckend`, `Papier` und `Schwebend`.
 - **Umfassende Anpassung**: Passe Farben, Ränder, Radien, Unschärfe und mehr über ein Live-Vorschau-Panel an.
-- **Dynamische Textfarben**: Text und Icons auf interaktiven Elementen (wie Quick Actions oder Szenen) passen sich automatisch an, um bei jeder Akzentfarbe lesbar zu bleiben.
-- **Visueller Editor**: Konfiguriere deine individuellen Karten direkt im Lovelace-Editor – ganz ohne YAML.
+- **Dynamische Textfarben**: Text und Icons auf interaktiven Elementen passen sich automatisch an, um bei jeder Akzentfarbe lesbar zu bleiben.
+- **Intelligenter Visueller Editor**: Der Editor zeigt dir jetzt die globalen Werte als Platzhalter an, damit du genau siehst, welche Einstellungen du für eine einzelne Karte überschreibst.
 - **Vorgaben-System**: Speichere, lade und teile deine Designs mühelos.
 - **Import & Export**: Sichere deine Einstellungen oder teile sie mit der Community.
 - **Eigene Hintergründe**: Lade unterschiedliche Hintergrundbilder für dein helles und dunkles Theme hoch.
-- **Deaktivierbare Animationen**: Schalte alle UI-Animationen mit einem Klick aus. Dies entfernt Hover-Effekte (wie das Vergrößern von Buttons), kontinuierliche Animationen (wie das rotierende Ventilator-Icon) und sanfte Übergänge für ein statisches, reaktionsschnelles Interface.
+- **Deaktivierbare Animationen**: Schalte alle UI-Animationen mit einem Klick aus.
+- **Benutzerdefinierter Service**: Wechsle dein Theme dynamisch über Automationen mit dem `mirage.apply_preset` Service.
+- **Diagnose-Tool**: Lade mit einem Klick einen Bericht deiner aktuellen Theme-Einstellungen herunter, um bei Problemen einfach Hilfe zu bekommen.
 
 ---
 
@@ -91,6 +93,24 @@ theme:
 Um die systemweiten Standardeinstellungen zu ändern, gehe zur Konfigurationsseite der Integration:
 **Einstellungen > Geräte & Dienste > Mirage UI > Konfigurieren**.
 
+### 4. Nutze den Service in Automationen
+Du kannst das globale Mirage Theme dynamisch ändern. Das ist nützlich, um die Atmosphäre deines Dashboards basierend auf Ereignissen anzupassen.
+
+**Beispiel:** Wechsle zum Preset "Movie Time", wenn dein Fernseher eingeschaltet wird.
+```yaml
+automation:
+  - alias: "Mirage Kino-Modus bei Filmstart"
+    trigger:
+      - platform: state
+        entity_id: media_player.wohnzimmer_tv
+        to: "playing"
+    action:
+      - service: mirage.apply_preset
+        data:
+          preset_name: "Movie Time"
+```
+**Wichtiger Hinweis**: Aktuell werden deine Presets im Browser gespeichert. Dieser Service ist daher ein Platzhalter für zukünftige Versionen, in denen Presets zentral verwaltet werden. Momentan protokolliert er den Aufruf nur im Home Assistant Log, damit du deine Automationen schon vorbereiten kannst.
+
 Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
 ---
@@ -114,12 +134,14 @@ This package is a single, unified **integration** that provides:
     2.  **Per-Card Styling**: Override the global theme for individual cards to highlight specific devices or sections.
 - **Multiple Card Styles**: Choose between styles like `Glass`, `Solid`, `Paper`, and `Floating`.
 - **Deep Customization**: Adjust colors, borders, radius, blur, and more via a live-preview UI panel.
-- **Dynamic Text Colors**: Text and icons on interactive elements (like Quick Actions or Scenes) automatically adapt to remain readable against any chosen accent color.
-- **Visual Editor**: Configure your individual cards directly in the Lovelace editor—no YAML required.
+- **Dynamic Text Colors**: Text and icons on interactive elements automatically adapt to remain readable against any chosen accent color.
+- **Smarter Visual Editor**: The editor now displays global values as placeholders, so you know exactly which settings you're overriding for an individual card.
 - **Preset System**: Save, load, and share your designs with ease.
 - **Import & Export**: Back up your settings or share them with the community.
 - **Custom Backgrounds**: Upload different background images for your light and dark themes.
-- **Toggleable Animations**: Disable all UI animations with a single switch. This removes hover effects (like button scaling), continuous animations (like the spinning fan icon), and smooth transitions for a static, snappy interface.
+- **Toggleable Animations**: Disable all UI animations with a single switch.
+- **Custom Service**: Change your theme dynamically via automations using the `mirage.apply_preset` service.
+- **Diagnostics Tool**: Download a report of your current theme settings with one click to easily get help with any issues.
 
 ---
 
@@ -189,6 +211,24 @@ theme:
 To change the system-wide default settings, go to the integration's configuration page:
 **Settings > Devices & Services > Mirage UI > Configure**.
 
+### 4. Use the Service in Automations
+You can change the global Mirage theme dynamically. This is useful for adapting your dashboard's atmosphere based on events.
+
+**Example:** Switch to the "Movie Time" preset when your TV turns on.
+```yaml
+automation:
+  - alias: "Mirage Movie Mode on Play"
+    trigger:
+      - platform: state
+        entity_id: media_player.living_room_tv
+        to: "playing"
+    action:
+      - service: mirage.apply_preset
+        data:
+          preset_name: "Movie Time"
+```
+**Important Note**: Currently, your presets are stored in the browser. This service is therefore a placeholder for future versions where presets will be managed centrally. For now, it only logs the call in the Home Assistant log, allowing you to prepare your automations.
+
 Your changes will apply instantly. Have fun designing!
 
 ---
@@ -211,6 +251,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN A ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
