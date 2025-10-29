@@ -11,7 +11,7 @@ from typing import Any, Dict
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 import voluptuous as vol
-from homeassistant.components.frontend import async_register_lovelace_resource
+from homeassistant.components.lovelace import async_register_resource
 
 from .const import DOMAIN
 
@@ -178,7 +178,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register the Mirage Card Lovelace resource using the modern helper
     resource_url = f"{static_path_url}/mirage-card.js"
     _LOGGER.debug("Ensuring Mirage Card Lovelace resource is registered: %s", resource_url)
-    await async_register_lovelace_resource(hass, resource_url, "module")
+    await async_register_resource(hass, resource_url, "module")
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
