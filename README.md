@@ -1,5 +1,9 @@
 # Mirage UI für Home Assistant
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png" alt="Mirage UI Logo" width="128">
+</div>
+
 **Träumst du von einem Smart-Home-Dashboard, das nicht nur intelligent, sondern auch atemberaubend ist?**
 
 Der Weg zu einer perfekten Oberfläche in Home Assistant kann komplex sein – Themes, Karten und Konfigurationen müssen oft mühsam aufeinander abgestimmt werden.
@@ -118,6 +122,10 @@ Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 ---
 
 # Mirage UI for Home Assistant (English)
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png" alt="Mirage UI Logo" width="128">
+</div>
 
 **Ever dreamed of a smart home dashboard that's not just smart, but absolutely stunning?**
 
