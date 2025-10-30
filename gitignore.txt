@@ -1,9 +1,0 @@
-# Python Caches
-__pycache__/
-*.pyc
-
-# VSCode Ordner
-.vscode/
-
-# Ignoriere diese Logodatei auf keinen Fall
-!custom_components/mirage/logo.png
