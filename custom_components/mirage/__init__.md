@@ -14,7 +14,14 @@ from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
 # Import the modern and stable helper for Lovelace resources
-from homeassistant.helpers.frontend import async_register_lovelace_resource
+try:
+    # For HA version >= 2023.4
+    from homeassistant.helpers.frontend import async_register_lovelace_resource
+except ImportError:
+    # For older HA versions
+    from homeassistant.components.lovelace.resources import (
+        async_register_lovelace_resource,
+    )
 
 from .const import (
     DOMAIN,
