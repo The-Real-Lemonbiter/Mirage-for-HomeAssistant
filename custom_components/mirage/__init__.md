@@ -16,7 +16,20 @@ import voluptuous as vol
 # Import the modern and stable helper for Lovelace resources
 from homeassistant.helpers.frontend import async_register_lovelace_resource
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    THEME_NAME_DARK,
+    THEME_NAME_LIGHT,
+    SERVICE_APPLY_PRESET,
+    WS_TYPE_GET_SETTINGS,
+    WS_TYPE_GET_LANGUAGE,
+    WS_TYPE_UPDATE_SETTINGS,
+    WS_TYPE_UPLOAD_IMAGE,
+    STATIC_PATH_URL,
+    WEBCOMPONENT_PATH,
+    LOVELACE_RESOURCE_URL,
+    WWW_BACKGROUNDS_DIR,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -81,7 +94,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
         "primary-background-color": day_config.get("bgColor", "#f3f4f6"),
     }
     
-    return {"Mirage Dark": dark_vars, "Mirage Light": light_vars}
+    return {THEME_NAME_DARK: dark_vars, THEME_NAME_LIGHT: light_vars}
 
 
 async def _apply_theme(hass: HomeAssistant, options: Dict[str, Any]) -> None:
@@ -89,8 +102,8 @@ async def _apply_theme(hass: HomeAssistant, options: Dict[str, Any]) -> None:
     try:
         themes = _generate_theme_config(options)
         # Apply the theme using the frontend service
-        await hass.services.async_call("frontend", "set_theme", {"name": "Mirage Dark", "mode": "dark", **themes["Mirage Dark"]}, blocking=True)
-        await hass.services.async_call("frontend", "set_theme", {"name": "Mirage Light", "mode": "light", **themes["Mirage Light"]}, blocking=True)
+        await hass.services.async_call("frontend", "set_theme", {"name": THEME_NAME_DARK, "mode": "dark", **themes[THEME_NAME_DARK]}, blocking=True)
+        await hass.services.async_call("frontend", "set_theme", {"name": THEME_NAME_LIGHT, "mode": "light", **themes[THEME_NAME_LIGHT]}, blocking=True)
         # Reload themes service call to make sure the frontend picks up the changes
         await hass.services.async_call("frontend", "reload_themes", {}, blocking=True)
         _LOGGER.debug("Mirage themes reloaded successfully.")
@@ -128,7 +141,7 @@ def async_register_websocket_handlers(hass: HomeAssistant, entry: ConfigEntry):
             file_name = msg["file_name"]
             
             www_dir = hass.config.path("www")
-            mirage_dir = os.path.join(www_dir, "mirage_backgrounds")
+            mirage_dir = os.path.join(www_dir, WWW_BACKGROUNDS_DIR)
             
             await hass.async_add_executor_job(os.makedirs, mirage_dir, exist_ok=True)
                 
@@ -140,7 +153,7 @@ def async_register_websocket_handlers(hass: HomeAssistant, entry: ConfigEntry):
             
             await hass.async_add_executor_job(write_file)
                 
-            public_url = f"/local/mirage_backgrounds/{file_name}"
+            public_url = f"/local/{WWW_BACKGROUNDS_DIR}/{file_name}"
             _LOGGER.info(f"Mirage background image saved to {public_url}")
             connection.send_result(msg["id"], {"success": True, "url": public_url})
         except Exception as e:
@@ -148,21 +161,21 @@ def async_register_websocket_handlers(hass: HomeAssistant, entry: ConfigEntry):
             connection.send_error(msg["id"], "upload_failed", str(e))
 
     hass.components.websocket_api.async_register_command(
-        "mirage/get_settings", get_settings,
-        vol.Schema({"type": "mirage/get_settings"})
+        WS_TYPE_GET_SETTINGS, get_settings,
+        vol.Schema({"type": WS_TYPE_GET_SETTINGS})
     )
     hass.components.websocket_api.async_register_command(
-        "mirage/get_language", get_language,
-        vol.Schema({"type": "mirage/get_language"})
+        WS_TYPE_GET_LANGUAGE, get_language,
+        vol.Schema({"type": WS_TYPE_GET_LANGUAGE})
     )
     hass.components.websocket_api.async_register_command(
-        "mirage/update_settings", update_settings,
-        vol.Schema({"type": vol.All("mirage/update_settings"), "settings": dict})
+        WS_TYPE_UPDATE_SETTINGS, update_settings,
+        vol.Schema({"type": vol.All(WS_TYPE_UPDATE_SETTINGS), "settings": dict})
     )
     hass.components.websocket_api.async_register_command(
-        "mirage/upload_image", upload_image,
+        WS_TYPE_UPLOAD_IMAGE, upload_image,
         vol.Schema({
-            "type": vol.All("mirage/upload_image"),
+            "type": vol.All(WS_TYPE_UPLOAD_IMAGE),
             "file_name": str,
             "file_data": str,
         })
@@ -174,22 +187,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Register the static path for the configuration panel and other www assets.
     # This makes files in `custom_components/mirage/www` available at `/mirage_static`.
-    static_path_url = "/mirage_static"
     static_path_dir = hass.config.path(f"custom_components/{DOMAIN}/www")
     await hass.http.async_register_static_paths(
-        [StaticPathConfig(url_path=static_path_url, path=static_path_dir, cache_headers=False)]
+        [StaticPathConfig(url_path=STATIC_PATH_URL, path=static_path_dir, cache_headers=False)]
     )
 
     # Register the Mirage Card Lovelace resource using the modern helper
-    resource_url = f"{static_path_url}/mirage-card.js"
-    _LOGGER.debug("Ensuring Mirage Card Lovelace resource is registered: %s", resource_url)
-    await async_register_lovelace_resource(hass, resource_url, "module")
+    _LOGGER.debug("Ensuring Mirage Card Lovelace resource is registered: %s", LOVELACE_RESOURCE_URL)
+    await async_register_lovelace_resource(hass, LOVELACE_RESOURCE_URL, "module")
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
     hass.components.frontend.async_register_webcomponent(
         "config-panel-mirage",
-        f"{static_path_url}/mirage-options.html"
+        WEBCOMPONENT_PATH
     )
     
     # Register the WebSocket handlers
@@ -199,7 +210,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         """Handle the service call to apply a preset."""
         # This can be implemented further to handle server-side presets
         pass
-    hass.services.async_register(DOMAIN, "apply_preset", async_handle_apply_preset)
+    hass.services.async_register(DOMAIN, SERVICE_APPLY_PRESET, async_handle_apply_preset)
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
     await _apply_theme(hass, entry.options)
@@ -207,7 +218,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    hass.services.async_remove(DOMAIN, "apply_preset")
+    hass.services.async_remove(DOMAIN, SERVICE_APPLY_PRESET)
     # In a real scenario, you'd also unregister the websocket handlers and webcomponent
     _LOGGER.info("Unloading Mirage UI integration.")
     return True
@@ -217,7 +228,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     _LOGGER.info("Removing Mirage UI integration and cleaning up resources.")
 
     # 1. Remove background images directory
-    mirage_bg_dir = hass.config.path("www", "mirage_backgrounds")
+    mirage_bg_dir = hass.config.path("www", WWW_BACKGROUNDS_DIR)
     if await hass.async_add_executor_job(os.path.isdir, mirage_bg_dir):
         try:
             await hass.async_add_executor_job(shutil.rmtree, mirage_bg_dir)
@@ -227,8 +238,8 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 
     # 2. Reset the themes to empty to effectively delete them
     try:
-        await hass.services.async_call("frontend", "set_theme", {"name": "Mirage Dark", "mode": "dark"}, blocking=True)
-        await hass.services.async_call("frontend", "set_theme", {"name": "Mirage Light", "mode": "light"}, blocking=True)
+        await hass.services.async_call("frontend", "set_theme", {"name": THEME_NAME_DARK, "mode": "dark"}, blocking=True)
+        await hass.services.async_call("frontend", "set_theme", {"name": THEME_NAME_LIGHT, "mode": "light"}, blocking=True)
         await hass.services.async_call("frontend", "reload_themes", {}, blocking=True)
         _LOGGER.debug("Cleared Mirage Dark and Mirage Light themes.")
     except Exception as e:
