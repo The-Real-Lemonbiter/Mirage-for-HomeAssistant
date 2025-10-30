@@ -1,8 +1,8 @@
 # Mirage UI für Home Assistant
 
-<div align="center">
+<p align="center">
   <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png" alt="Mirage UI Logo" width="128">
-</div>
+</p>
 
 **Träumst du von einem Smart-Home-Dashboard, das nicht nur intelligent, sondern auch atemberaubend ist?**
 
@@ -123,9 +123,9 @@ Deine Änderungen werden sofort übernommen. Viel Spaß beim Gestalten!
 
 # Mirage UI for Home Assistant (English)
 
-<div align="center">
+<p align="center">
   <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png" alt="Mirage UI Logo" width="128">
-</div>
+</p>
 
 **Ever dreamed of a smart home dashboard that's not just smart, but absolutely stunning?**
 

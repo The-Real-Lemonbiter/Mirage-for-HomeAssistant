@@ -5,6 +5,7 @@
   "issue_tracker": "https://github.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/issues",
   "codeowners": ["@The-Real-Lemonbiter"],
   "version": "0.1.0",
+  "logo": "https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png",
   "requirements": ["awesome-version"],
   "dependencies": ["frontend"],
   "iot_class": "calculated",
