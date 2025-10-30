@@ -1,9 +1,0 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Home Assistant
-.DS_Store
-deps/

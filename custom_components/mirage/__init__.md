@@ -1,4 +1,3 @@
-
 """The Mirage UI integration."""
 from __future__ import annotations
 import logging
@@ -7,22 +6,15 @@ import shutil
 import base64
 from typing import Any, Dict
 
-from awesome_version import AwesomeVersion
-from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
-# Import the modern and stable helper for Lovelace resources based on HA version.
-# This ensures future compatibility (e.g., for versions >= 2025.10) by checking
-# against known breaking changes.
-if AwesomeVersion(HA_VERSION) >= "2023.4.0":
-    from homeassistant.helpers.frontend import async_register_lovelace_resource
-else:
-    from homeassistant.components.lovelace.resources import (
-        async_register_lovelace_resource,
-    )
+# Import the modern and stable helper for Lovelace resources.
+# As per project requirements (HA 2025.10.x+), we can use the modern path directly.
+from homeassistant.helpers.frontend import async_register_lovelace_resource
+
 
 from .const import (
     DOMAIN,
