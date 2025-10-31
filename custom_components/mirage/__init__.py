@@ -11,9 +11,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
-# Import the modern and stable helper for Lovelace resources.
-# As per project requirements (HA 2025.10.x+), we can use the modern path directly.
-from homeassistant.helpers.frontend import async_register_lovelace_resource
+# Helper for registering Lovelace resources.
+from homeassistant.helpers.lovelace_resources import async_register_lovelace_resource
 
 
 from .const import (
