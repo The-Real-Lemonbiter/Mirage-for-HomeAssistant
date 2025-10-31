@@ -12,9 +12,9 @@ import { ToggleSwitch } from './components/ToggleSwitch';
 import { SettingsProvider, useSettings } from './components/SettingsProvider';
 import { SettingsPanel } from './components/SettingsPanel';
 import { 
-  LightbulbIcon, ThermostatIcon, HumidityIcon, DoorIcon, PlayIcon, PauseIcon, NextIcon, PrevIcon, SpeakerIcon, 
+  LightbulbIcon, ThermostatIcon, HumidityIcon, DoorIcon, PlayIcon, PauseIcon, NextIcon, PrevIcon, 
   SettingsIcon, MovieIcon, BedIcon, WeatherCloudyIcon, UserIcon, ChipIcon, MemoryIcon, StorageIcon,
-  PowerOffIcon, RobotIcon, ShieldCheckIcon, WifiIcon, ArrowDownTrayIcon, ArrowUpTrayIcon, DevicePhoneMobileIcon,
+  ArrowDownTrayIcon, ArrowUpTrayIcon, DevicePhoneMobileIcon,
   SparklesIcon, CloudRainIcon,
 } from './components/icons';
 import type { 

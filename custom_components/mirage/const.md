@@ -19,7 +19,6 @@ WS_TYPE_UPLOAD_IMAGE = "mirage/upload_image"
 # Static Paths
 STATIC_PATH_URL = "/mirage_static"
 WEBCOMPONENT_PATH = f"{STATIC_PATH_URL}/mirage-options.html"
-LOVELACE_RESOURCE_URL = f"{STATIC_PATH_URL}/mirage-card.js"
 
 # File System Paths
 WWW_BACKGROUNDS_DIR = "mirage_backgrounds"

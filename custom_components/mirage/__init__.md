@@ -1,3 +1,4 @@
+
 """The Mirage UI integration."""
 from __future__ import annotations
 import logging
@@ -11,10 +12,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
-# Helper for registering Lovelace resources.
-from homeassistant.helpers.lovelace import async_register_lovelace_resource
-
-
 from .const import (
     DOMAIN,
     THEME_NAME_DARK,
@@ -26,7 +23,6 @@ from .const import (
     WS_TYPE_UPLOAD_IMAGE,
     STATIC_PATH_URL,
     WEBCOMPONENT_PATH,
-    LOVELACE_RESOURCE_URL,
     WWW_BACKGROUNDS_DIR,
 )
 
@@ -190,9 +186,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         [StaticPathConfig(url_path=STATIC_PATH_URL, path=static_path_dir, cache_headers=False)]
     )
 
-    # Register the Mirage Card Lovelace resource using the modern helper
-    _LOGGER.debug("Ensuring Mirage Card Lovelace resource is registered: %s", LOVELACE_RESOURCE_URL)
-    await async_register_lovelace_resource(hass, LOVELACE_RESOURCE_URL, "module")
+    # The Lovelace resource for mirage-card.js is now handled by HACS automatically.
+    # The manual registration is removed to fix the startup error on modern HA versions.
+    _LOGGER.debug("Skipping programmatic Lovelace resource registration; handled by HACS.")
 
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
