@@ -1,7 +1,7 @@
 # Mirage UI for Home Assistant
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/custom_components/mirage/logo.png" alt="Mirage UI Logo" width="128">
+  <img src="https://raw.githubusercontent.com/The-Real-Lemonbiter/Mirage-for-HomeAssistant/main/logo.png" alt="Mirage UI Logo" width="128">
 </p>
 
 <p align="center">
