@@ -1,70 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mirage UI Options</title>
-    <style>
-        /* Basic styles to make it look like part of HA */
-        body {
-            margin: 0;
-            background-color: transparent; /* Let HA's background show through */
-            color: var(--primary-text-color);
-            font-family: var(--paper-font-body1_-_font-family);
-        }
-        /* Custom styles for UI components used in SettingsPanel */
-        .upload-btn {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #e5e7eb;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-        .upload-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .clear-btn {
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-        .clear-btn:hover {
-             background-color: rgba(239, 68, 68, 0.2);
-        }
-    </style>
 </head>
 <body>
-    <div id="root"></div>
     <script type="module">
-        // This script block bridges the gap between Home Assistant's frontend and our React app.
-        // It dynamically imports the necessary HA frontend modules.
-        (async () => {
-            try {
-                // These are standard modules provided by the Home Assistant frontend.
-                const { getAuth } = await import('/auth/token.js');
-                // Use the official, stable path for the WebSocket connection library.
-                const { createConnection } = await import('/static/home-assistant-js-websocket/create_connection.js');
+        class HaConfigPanelMirage extends HTMLElement {
+            constructor() {
+                super();
+                this._hass = null;
+                this._configEntryId = null;
+                this._rootElement = null;
+                this._reactRoot = null;
+                this._stylesApplied = false;
+            }
 
-                // Make these functions globally available for our ha-connection.ts to use.
-                window.getAuth = getAuth;
-                window.createConnection = createConnection;
+            set hass(hass) {
+                this._hass = hass;
+                this._render();
+            }
+            
+            set configEntryId(id) {
+                this._configEntryId = id;
+            }
 
-                // Now that the HA connection helpers are ready, load our main React application.
-                await import("/mirage_static/index.tsx");
-            } catch (e) {
-                console.error("Failed to load Home Assistant connection modules.", e);
-                const root = document.getElementById('root');
-                if (root) {
-                    root.innerHTML = `<div style="color: red; padding: 16px;">Error: Could not load Home Assistant connection utilities. Make sure you are running a compatible version of Home Assistant.</div>`;
+            connectedCallback() {
+                if (!this._rootElement) {
+                    this.attachShadow({ mode: 'open' });
+                    this._rootElement = document.createElement('div');
+                    this._rootElement.style.height = '100%';
+                    this.shadowRoot.appendChild(this._rootElement);
                 }
             }
-        })();
+
+            async _render() {
+                if (!this._hass || !this.configEntryId || !this._rootElement) {
+                    return;
+                }
+                
+                if (!this._reactRoot) {
+                    // Import React and ReactDOM dynamically
+                    const React = await import('react');
+                    const ReactDOM = await import('react-dom/client');
+                    this._reactRoot = ReactDOM.createRoot(this._rootElement);
+                }
+                
+                if (!this._stylesApplied) {
+                    const styleTag = document.createElement('style');
+                    styleTag.textContent = `
+                        :host {
+                            display: block;
+                            height: 100%;
+                            background-color: transparent;
+                        }
+                        .upload-btn {
+                            background-color: rgba(255, 255, 255, 0.05);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            color: #e5e7eb;
+                            padding: 8px 12px;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            transition: background-color 0.2s;
+                        }
+                        .upload-btn:hover { background-color: rgba(255, 255, 255, 0.1); }
+                        .clear-btn {
+                            background-color: rgba(239, 68, 68, 0.1);
+                            border: 1px solid rgba(239, 68, 68, 0.2);
+                            color: #fca5a5;
+                            padding: 8px 12px;
+                            border-radius: 8px;
+                            font-size: 14px;
+                            transition: background-color 0.2s;
+                        }
+                        .clear-btn:hover { background-color: rgba(239, 68, 68, 0.2); }
+                    `;
+                    this.shadowRoot.appendChild(styleTag);
+                    this._stylesApplied = true;
+                }
+
+                // Import the rest of the app and render it
+                const { default: App, SettingsProvider, SettingsPanel, HAConnection } = await (async () => {
+                    const [
+                        appModule,
+                        settingsProviderModule, 
+                        settingsPanelModule, 
+                        haConnectionModule
+                    ] = await Promise.all([
+                        import('/mirage_static/App.tsx'),
+                        import('/mirage_static/components/SettingsProvider.tsx'),
+                        import('/mirage_static/components/SettingsPanel.tsx'),
+                        import('/mirage_static/ha-connection.ts')
+                    ]);
+                    return { 
+                        default: appModule.default,
+                        SettingsProvider: settingsProviderModule.SettingsProvider,
+                        SettingsPanel: settingsPanelModule.SettingsPanel,
+                        HAConnection: haConnectionModule.HAConnection,
+                    };
+                })();
+
+                const haConnection = new HAConnection(this._hass, this.configEntryId);
+                const React = await import('react');
+
+                const SettingsWrapper = () => {
+                    return React.createElement(
+                        SettingsProvider,
+                        { haConnection: haConnection },
+                        React.createElement(SettingsPanel, {
+                            isOpen: true,
+                            onClose: () => {},
+                            isHaIntegration: true
+                        })
+                    );
+                };
+                
+                this._reactRoot.render(React.createElement(React.StrictMode, {}, React.createElement(SettingsWrapper)));
+            }
+        }
+        customElements.define('ha-config-panel-mirage', HaConfigPanelMirage);
     </script>
 </body>
 </html>

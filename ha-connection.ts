@@ -7,28 +7,12 @@
 
 import type { SettingsState } from './types';
 
-// This is a simplified version of the HA connection logic.
-// In a real scenario, you'd import these types from home-assistant-js-websocket.
-type HAConnectionObj = {
-    subscribeMessage: (callback: (message: any) => void, subscribeMessage: any) => Promise<any>;
-    sendMessagePromise: (message: any) => Promise<any>;
-    close: () => void;
-    // Simulate the hass object being available after connection
-    hass: {
-        language: string;
-    }
+// Define a basic type for the hass object for better type safety.
+// In a real environment, this would be imported from Home Assistant's types.
+type HassObject = {
+    callWS: <T>(msg: { type: string, [key: string]: any }) => Promise<T>;
+    language: string;
 };
-
-// This function is expected to be available in the context of the HA frontend
-declare function getAuth(options?: { hassUrl?: string }): Promise<{
-    wsUrl: string;
-    accessToken: string;
-    expired: boolean;
-    expires: number;
-    // ... and other properties
-}>;
-
-declare function createConnection(options: { auth: any }): Promise<HAConnectionObj>;
 
 function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -40,33 +24,20 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export class HAConnection {
-    private connection: HAConnectionObj | null = null;
+    private hass: HassObject;
     private configEntryId: string;
 
-    constructor(configEntryId: string) {
+    constructor(hass: HassObject, configEntryId: string) {
+        if (!hass || !hass.callWS) {
+            throw new Error("A valid Home Assistant 'hass' object must be provided.");
+        }
+        this.hass = hass;
         this.configEntryId = configEntryId;
     }
 
-    private async connect(): Promise<HAConnectionObj> {
-        if (this.connection) {
-            return this.connection;
-        }
-
-        try {
-            // Fix: Call getAuth without arguments for the current context.
-            const auth = await getAuth();
-            this.connection = await createConnection({ auth });
-            return this.connection;
-        } catch (err) {
-            console.error("Failed to connect to Home Assistant WebSocket", err);
-            throw new Error("Could not establish connection with Home Assistant.");
-        }
-    }
-
     public async getSettings(): Promise<any> {
-        const conn = await this.connect();
         try {
-            const result = await conn.sendMessagePromise({
+            const result = await this.hass.callWS({
                 type: 'mirage/get_settings',
                 config_entry_id: this.configEntryId,
             });
@@ -78,16 +49,13 @@ export class HAConnection {
     }
     
     public async getLanguage(): Promise<string> {
-        const conn = await this.connect();
-        // In a real HA environment, the hass object is available on the connection.
-        // We simulate this behavior here.
-        return conn.hass?.language || 'en';
+        // The language is directly available on the hass object.
+        return Promise.resolve(this.hass.language || 'en');
     }
 
     public async updateSettings(settings: SettingsState): Promise<void> {
-        const conn = await this.connect();
         try {
-            await conn.sendMessagePromise({
+            await this.hass.callWS({
                 type: 'mirage/update_settings',
                 config_entry_id: this.configEntryId,
                 settings: settings,
@@ -99,10 +67,9 @@ export class HAConnection {
     }
 
     public async uploadImage(file: File): Promise<{ url: string }> {
-        const conn = await this.connect();
         const fileData = await fileToBase64(file);
         try {
-            const result = await conn.sendMessagePromise({
+            const result = await this.hass.callWS<{ url: string }>({
                 type: 'mirage/upload_image',
                 file_name: file.name,
                 file_data: fileData,

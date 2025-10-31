@@ -12,7 +12,7 @@ from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
 # Helper for registering Lovelace resources.
-from homeassistant.helpers.lovelace_resources import async_register_lovelace_resource
+from homeassistant.helpers.lovelace_component import async_register_lovelace_resource
 
 
 from .const import (
@@ -50,7 +50,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
     day_config = options.get("day", {})
 
     # Dark Theme Variables
-    glass_alpha_dark = (night_config.get("transparency", 30) / 100) * 1.8
+    glass_alpha_dark = night_config.get("transparency", 30) / 100
     floating_alpha_dark = night_config.get("floatingOpacity", 100) / 100
     dark_vars = {
         "mirage-accent-color": night_config.get("accentColor", "#3b82f6"),
@@ -64,7 +64,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
         "mirage-border-width": f"{night_config.get('borderThickness', 1.0)}px",
         "mirage-separator-width": f"{night_config.get('separatorThickness', 1.0)}px",
         "mirage-glass-blur": f"{night_config.get('blurIntensity', 20)}px",
-        "mirage-glass-bg-color-dark": f"rgba(86, 94, 88, {glass_alpha_dark:.2f})",
+        "mirage-glass-bg-color-dark": _hex_to_rgba(night_config.get("solidColor", "#2d3748"), glass_alpha_dark),
         "mirage-solid-bg-color-dark": night_config.get("solidColor", "#2d3748"),
         "mirage-paper-bg-color-dark": night_config.get("paperColor", "#2a2d35"),
         "mirage-floating-bg-color-dark": _hex_to_rgba(night_config.get("floatingColor", "#2a323d"), floating_alpha_dark),
@@ -72,7 +72,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
     }
 
     # Light Theme Variables
-    glass_alpha_light = (day_config.get("transparency", 30) / 100) * 2.0
+    glass_alpha_light = day_config.get("transparency", 30) / 100
     floating_alpha_light = day_config.get("floatingOpacity", 100) / 100
     light_vars = {
         "mirage-accent-color": day_config.get("accentColor", "#3b82f6"),
@@ -86,7 +86,7 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
         "mirage-border-width": f"{day_config.get('borderThickness', 1.0)}px",
         "mirage-separator-width": f"{day_config.get('separatorThickness', 1.0)}px",
         "mirage-glass-blur": f"{day_config.get('blurIntensity', 20)}px",
-        "mirage-glass-bg-color-light": f"rgba(240, 240, 240, {glass_alpha_light:.2f})",
+        "mirage-glass-bg-color-light": _hex_to_rgba(day_config.get("solidColor", "#e2e8f0"), glass_alpha_light),
         "mirage-solid-bg-color-light": day_config.get("solidColor", "#e2e8f0"),
         "mirage-paper-bg-color-light": day_config.get("paperColor", "#ffffff"),
         "mirage-floating-bg-color-light": _hex_to_rgba(day_config.get("floatingColor", "#ffffff"), floating_alpha_light),
@@ -198,7 +198,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register the custom settings panel, pointing to the URL provided by the static path.
     # Home Assistant will automatically use this for the options flow.
     hass.components.frontend.async_register_webcomponent(
-        "config-panel-mirage",
+        "ha-config-panel-mirage",
         WEBCOMPONENT_PATH
     )
     

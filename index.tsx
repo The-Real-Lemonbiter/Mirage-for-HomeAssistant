@@ -7,43 +7,23 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { SettingsProvider } from './components/SettingsProvider';
-import { SettingsPanel } from './components/SettingsPanel';
-import { HAConnection } from './ha-connection';
 import App from './App';
 
+// This entrypoint is now only used for the standalone preview mode,
+// which is loaded via index.html. The Home Assistant settings panel
+// has its own loader inside mirage-options.html, which imports
+// components directly.
+
 const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const urlParams = new URLSearchParams(window.location.search);
-const configEntryId = urlParams.get('config_entry_id');
-const root = ReactDOM.createRoot(rootElement);
-
-if (!configEntryId) {
-    // This is the standalone preview mode. Render the main App dashboard.
+if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
 } else {
-    // This is the Home Assistant integration settings panel.
-    const haConnection = new HAConnection(configEntryId);
-    
-    const SettingsWrapper = () => {
-        return (
-            <SettingsProvider haConnection={haConnection}>
-                {/* We don't need a close button here as HA provides it */}
-                <SettingsPanel isOpen={true} onClose={() => {}} isHaIntegration={true} />
-            </SettingsProvider>
-        );
-    };
-
-    root.render(
-      <React.StrictMode>
-        <SettingsWrapper />
-      </React.StrictMode>
-    );
+    // This indicates the script might be running in a context without a #root div,
+    // like the HA config panel. We let mirage-options.html handle the rendering.
+    console.log("Mirage UI script loaded. Standalone root element not found, assuming integration mode.");
 }
