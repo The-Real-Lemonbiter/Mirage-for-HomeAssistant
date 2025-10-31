@@ -12,7 +12,7 @@ from homeassistant.components.http import StaticPathConfig
 import voluptuous as vol
 
 # Helper for registering Lovelace resources.
-from homeassistant.helpers.lovelace_component import async_register_lovelace_resource
+from homeassistant.helpers.lovelace import async_register_lovelace_resource
 
 
 from .const import (
@@ -49,51 +49,50 @@ def _generate_theme_config(options: Dict[str, Any]) -> Dict[str, Any]:
     night_config = options.get("night", {})
     day_config = options.get("day", {})
 
-    # Dark Theme Variables
-    glass_alpha_dark = night_config.get("transparency", 30) / 100
-    floating_alpha_dark = night_config.get("floatingOpacity", 100) / 100
-    dark_vars = {
-        "mirage-accent-color": night_config.get("accentColor", "#3b82f6"),
-        "mirage-temperature-color": night_config.get("temperatureColor") or "var(--mirage-accent-color)",
-        "mirage-weather-color": night_config.get("weatherColor") or "var(--mirage-accent-color)",
-        "mirage-humidity-color": night_config.get("humidityColor") or "var(--mirage-accent-color)",
-        "mirage-door-color": night_config.get("doorColor") or "var(--mirage-accent-color)",
-        "mirage-primary-text-color": night_config.get("pageTextColor", {}).get("primary", "#e5e7eb"),
-        "mirage-secondary-text-color": night_config.get("pageTextColor", {}).get("secondary", "#9ca3af"),
-        "mirage-border-radius": f"{night_config.get('borderRadius', 16)}px",
-        "mirage-border-width": f"{night_config.get('borderThickness', 1.0)}px",
-        "mirage-separator-width": f"{night_config.get('separatorThickness', 1.0)}px",
-        "mirage-glass-blur": f"{night_config.get('blurIntensity', 20)}px",
-        "mirage-glass-bg-color-dark": _hex_to_rgba(night_config.get("solidColor", "#2d3748"), glass_alpha_dark),
+    # These variables are unique to each mode but must be present in BOTH themes
+    # for the frontend to switch styles without variables becoming undefined.
+    mode_specific_vars = {
+        "mirage-glass-bg-color-dark": _hex_to_rgba(night_config.get("solidColor", "#2d3748"), night_config.get("transparency", 30) / 100),
         "mirage-solid-bg-color-dark": night_config.get("solidColor", "#2d3748"),
         "mirage-paper-bg-color-dark": night_config.get("paperColor", "#2a2d35"),
-        "mirage-floating-bg-color-dark": _hex_to_rgba(night_config.get("floatingColor", "#2a323d"), floating_alpha_dark),
-        "primary-background-color": night_config.get("bgColor", "#0d1117"),
-    }
-
-    # Light Theme Variables
-    glass_alpha_light = day_config.get("transparency", 30) / 100
-    floating_alpha_light = day_config.get("floatingOpacity", 100) / 100
-    light_vars = {
-        "mirage-accent-color": day_config.get("accentColor", "#3b82f6"),
-        "mirage-temperature-color": day_config.get("temperatureColor") or "var(--mirage-accent-color)",
-        "mirage-weather-color": day_config.get("weatherColor") or "var(--mirage-accent-color)",
-        "mirage-humidity-color": day_config.get("humidityColor") or "var(--mirage-accent-color)",
-        "mirage-door-color": day_config.get("doorColor") or "var(--mirage-accent-color)",
-        "mirage-primary-text-color": day_config.get("pageTextColor", {}).get("primary", "#1f2937"),
-        "mirage-secondary-text-color": day_config.get("pageTextColor", {}).get("secondary", "#4b5563"),
-        "mirage-border-radius": f"{day_config.get('borderRadius', 16)}px",
-        "mirage-border-width": f"{day_config.get('borderThickness', 1.0)}px",
-        "mirage-separator-width": f"{day_config.get('separatorThickness', 1.0)}px",
-        "mirage-glass-blur": f"{day_config.get('blurIntensity', 20)}px",
-        "mirage-glass-bg-color-light": _hex_to_rgba(day_config.get("solidColor", "#e2e8f0"), glass_alpha_light),
+        "mirage-floating-bg-color-dark": _hex_to_rgba(night_config.get("floatingColor", "#2a323d"), night_config.get("floatingOpacity", 100) / 100),
+        
+        "mirage-glass-bg-color-light": _hex_to_rgba(day_config.get("solidColor", "#e2e8f0"), day_config.get("transparency", 30) / 100),
         "mirage-solid-bg-color-light": day_config.get("solidColor", "#e2e8f0"),
         "mirage-paper-bg-color-light": day_config.get("paperColor", "#ffffff"),
-        "mirage-floating-bg-color-light": _hex_to_rgba(day_config.get("floatingColor", "#ffffff"), floating_alpha_light),
-        "primary-background-color": day_config.get("bgColor", "#f3f4f6"),
+        "mirage-floating-bg-color-light": _hex_to_rgba(day_config.get("floatingColor", "#ffffff"), day_config.get("floatingOpacity", 100) / 100),
     }
+
+    # Helper to generate the common part of the theme for a specific mode.
+    def build_common_vars(mode_config: dict, defaults: dict) -> dict:
+        return {
+            "mirage-accent-color": mode_config.get("accentColor", defaults["accentColor"]),
+            "mirage-temperature-color": mode_config.get("temperatureColor") or "var(--mirage-accent-color)",
+            "mirage-weather-color": mode_config.get("weatherColor") or "var(--mirage-accent-color)",
+            "mirage-humidity-color": mode_config.get("humidityColor") or "var(--mirage-accent-color)",
+            "mirage-door-color": mode_config.get("doorColor") or "var(--mirage-accent-color)",
+            "mirage-primary-text-color": mode_config.get("pageTextColor", {}).get("primary", defaults["primaryTextColor"]),
+            "mirage-secondary-text-color": mode_config.get("pageTextColor", {}).get("secondary", defaults["secondaryTextColor"]),
+            "mirage-border-radius": f"{mode_config.get('borderRadius', defaults['borderRadius'])}px",
+            "mirage-border-width": f"{mode_config.get('borderThickness', defaults['borderThickness'])}px",
+            "mirage-separator-width": f"{mode_config.get('separatorThickness', defaults['separatorThickness'])}px",
+            "mirage-glass-blur": f"{mode_config.get('blurIntensity', defaults['blurIntensity'])}px",
+            "primary-background-color": mode_config.get("bgColor", defaults["bgColor"]),
+        }
+
+    dark_defaults = {
+        "accentColor": "#3b82f6", "primaryTextColor": "#e5e7eb", "secondaryTextColor": "#9ca3af",
+        "borderRadius": 16, "borderThickness": 1.0, "separatorThickness": 1.0, "blurIntensity": 20, "bgColor": "#0d1117"
+    }
+    light_defaults = {
+        "accentColor": "#3b82f6", "primaryTextColor": "#1f2937", "secondaryTextColor": "#4b5563",
+        "borderRadius": 16, "borderThickness": 1.0, "separatorThickness": 1.0, "blurIntensity": 20, "bgColor": "#f3f4f6"
+    }
+
+    dark_theme = {**build_common_vars(night_config, dark_defaults), **mode_specific_vars}
+    light_theme = {**build_common_vars(day_config, light_defaults), **mode_specific_vars}
     
-    return {THEME_NAME_DARK: dark_vars, THEME_NAME_LIGHT: light_vars}
+    return {THEME_NAME_DARK: dark_theme, THEME_NAME_LIGHT: light_theme}
 
 
 async def _apply_theme(hass: HomeAssistant, options: Dict[str, Any]) -> None:
