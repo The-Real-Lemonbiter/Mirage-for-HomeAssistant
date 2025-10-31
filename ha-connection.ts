@@ -20,7 +20,7 @@ type HAConnectionObj = {
 };
 
 // This function is expected to be available in the context of the HA frontend
-declare function getAuth(options: { hassUrl?: string }): Promise<{
+declare function getAuth(options?: { hassUrl?: string }): Promise<{
     wsUrl: string;
     accessToken: string;
     expired: boolean;
@@ -53,8 +53,8 @@ export class HAConnection {
         }
 
         try {
-            // Fix: Pass an empty object to getAuth as per its declaration.
-            const auth = await getAuth({});
+            // Fix: Call getAuth without arguments for the current context.
+            const auth = await getAuth();
             this.connection = await createConnection({ auth });
             return this.connection;
         } catch (err) {
