@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mirage UI Options</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Basic styles to make it look like part of HA */
         body {
@@ -39,16 +38,6 @@
              background-color: rgba(239, 68, 68, 0.2);
         }
     </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "recharts": "https://aistudiocdn.com/recharts@^2.12.7/es6/index.js"
-      }
-    }
-    </script>
 </head>
 <body>
     <div id="root"></div>
@@ -59,7 +48,8 @@
             try {
                 // These are standard modules provided by the Home Assistant frontend.
                 const { getAuth } = await import('/auth/token.js');
-                const { createConnection } = await import('/hacsfiles/home-assistant-js-websocket/dist/index.js');
+                // Use the official, stable path for the WebSocket connection library.
+                const { createConnection } = await import('/static/home-assistant-js-websocket/create_connection.js');
 
                 // Make these functions globally available for our ha-connection.ts to use.
                 window.getAuth = getAuth;

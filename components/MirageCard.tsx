@@ -85,7 +85,7 @@ export const MirageCard: React.FC<MirageCardProps> = ({
   return (
     <div className={`${containerClasses} ${className}`} style={finalContainerStyle}>
       <div className={`px-6 py-4 relative z-10`} style={finalHeaderStyle}>
-        <h2 className="font-semibold tracking-wide text-lg">{title}</h2>
+        <h2 className="font-semibold tracking-wide text-lg break-words">{title}</h2>
       </div>
       <div className="p-6 relative z-10" style={contentStyle}>
         {children}

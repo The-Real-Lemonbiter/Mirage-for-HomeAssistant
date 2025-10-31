@@ -12,7 +12,7 @@ import {
     SunIcon, MoonIcon, StyleGlassIcon, StyleSolidIcon, StyleFloatingIcon, StylePaperIcon,
     BlurIcon, ContrastIcon, BorderIcon, BorderRadiusIcon, SeparatorIcon, 
     ColorPaletteIcon, UploadIcon, XIcon, LightbulbIcon, FontIcon, AnimationIcon,
-    SaveIcon, TrashIcon, ExportIcon, ImportIcon, LanguageIcon
+    SaveIcon, TrashIcon, ExportIcon, ImportIcon, LanguageIcon, SettingsIcon
 } from './icons';
 import { SettingsState, EditMode } from '../types';
 
@@ -382,7 +382,7 @@ interface SettingsPanelProps {
 }
 
 export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, isHaIntegration = false }) => {
-    const { t, settings, updateGeneralSetting, resetSettings, exportSettings, importSettings, activeEditMode, setActiveEditMode, setTheme, saveSettingsToHA, haLanguage, setHaLanguage } = useSettings();
+    const { t, settings, updateGeneralSetting, resetSettings, exportSettings, importSettings, setActiveEditMode, setTheme, saveSettingsToHA, haLanguage, setHaLanguage } = useSettings();
     const [activeTab, setActiveTab] = useState<'day' | 'night' | 'general'>('night');
     const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     
@@ -405,6 +405,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, i
     };
     
     if (!settings) return null; // Or a loading spinner
+    
+    const activeTabClasses = 'bg-gray-200 text-black font-semibold';
+    const inactiveTabClasses = 'text-gray-300 hover:bg-white/10';
+    const tabBaseClasses = 'flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors';
 
     const panelContent = (
       <div
@@ -422,9 +426,18 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose, i
           <SettingsPreview />
           
           <nav className="flex items-center p-1 mx-4 mt-4 rounded-lg bg-black/20 flex-shrink-0">
-              <button onClick={() => handleTabClick('day')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'day' ? 'bg-gray-200 text-black font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('dayTab')}</button>
-              <button onClick={() => handleTabClick('night')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'night' ? 'bg-gray-600 text-white font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('nightTab')}</button>
-              <button onClick={() => handleTabClick('general')} className={`flex-1 flex items-center justify-center space-x-2 py-2 text-sm rounded-md transition-colors ${activeTab === 'general' ? 'bg-gray-400 text-black font-semibold' : 'text-gray-300 hover:bg-white/10'}`}>{t('generalTab')}</button>
+              <button onClick={() => handleTabClick('day')} className={`${tabBaseClasses} ${activeTab === 'day' ? activeTabClasses : inactiveTabClasses}`}>
+                <SunIcon className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t('dayTab')}</span>
+              </button>
+              <button onClick={() => handleTabClick('night')} className={`${tabBaseClasses} ${activeTab === 'night' ? activeTabClasses : inactiveTabClasses}`}>
+                <MoonIcon className="w-4 h-4" />
+                <span className="whitespace-nowrap">{t('nightTab')}</span>
+              </button>
+              <button onClick={() => handleTabClick('general')} className={`${tabBaseClasses} ${activeTab === 'general' ? activeTabClasses : inactiveTabClasses}`}>
+                 <SettingsIcon className="w-4 h-4" />
+                 <span className="whitespace-nowrap">{t('generalTab')}</span>
+              </button>
           </nav>
 
           <div className="p-4 overflow-y-auto flex-grow">

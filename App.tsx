@@ -35,13 +35,13 @@ const Dashboard: React.FC = () => {
   }, []);
 
   // MOCK DEVICE STATES
-  const [lights, setLights] = useState({ livingRoom: true, kitchen: false, bedroom: true });
+  const [lights, setLights] = useState({ livingRoom: true, kitchen: false, bedroom: true, anUnusuallyLongDeviceNameForTestingOverflow: false });
   const [thermostat, setThermostat] = useState<ThermostatDevice>({ id: 'main_thermostat', name: 'Main Thermostat', currentTemp: 21, targetTemp: 22, mode: 'heat' });
   const [sensors] = useState<SensorDevice[]>([
     { id: 'front_door', name: 'Front Door', value: 'Closed', icon: 'door' },
-    { id: 'living_humidity', name: 'Living Room Humidity', value: '45%', icon: 'humidity' },
+    { id: 'living_humidity', name: 'Living Room Humidity Sensor with a very long name', value: '45%', icon: 'humidity' },
   ]);
-  const [media, setMedia] = useState<MediaDevice>({ isPlaying: true, artist: 'Lofi Girl', title: 'Beats to Relax/Study to', albumArt: 'https://picsum.photos/seed/lofi/200/200' });
+  const [media, setMedia] = useState<MediaDevice>({ isPlaying: true, artist: 'Lofi Girl', title: 'Beats to Relax/Study to - a really long title to see how truncation works', albumArt: 'https://picsum.photos/seed/lofi/200/200' });
   const [scenes, setScenes] = useState({ movie: true, goodnight: false });
   const [switches, setSwitches] = useState({ sprinkler: false, poolPump: true });
   const [weather] = useState({ temp: 18, condition: 'Cloudy' });
@@ -146,10 +146,10 @@ const Dashboard: React.FC = () => {
           <MirageCard title="Lights" {...mirageCardProps}>
             <div className="space-y-4">
               {Object.entries(lights).map(([key, isOn]) => (
-                <div key={key} className="flex justify-between items-center">
-                  <div className="flex items-center space-x-3">
-                    <LightbulbIcon className="w-6 h-6" style={{ color: isOn ? accentColor : 'currentColor', opacity: isOn ? 1 : 0.4 }}/>
-                    <span>{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</span>
+                <div key={key} className="flex justify-between items-center gap-4">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <LightbulbIcon className="w-6 h-6 flex-shrink-0" style={{ color: isOn ? accentColor : 'currentColor', opacity: isOn ? 1 : 0.4 }}/>
+                    <span className="break-words">{key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}</span>
                   </div>
                   <ToggleSwitch isOn={isOn} onToggle={() => handleLightToggle(key as keyof typeof lights)} theme={theme} accentColor={accentColor} />
                 </div>
@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
 
           <MirageCard title="Climate" {...mirageCardProps}>
              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
                     <ThermostatIcon className="w-8 h-8" style={{ color: temperatureColor }} />
                     <div>
                         <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>Inside</p>
@@ -180,12 +180,12 @@ const Dashboard: React.FC = () => {
           <MirageCard title="Sensors" {...mirageCardProps}>
             <div className="space-y-4">
               {sensors.map(sensor => (
-                <div key={sensor.id} className="flex justify-between items-center">
-                  <div className="flex items-center space-x-3">
+                <div key={sensor.id} className="flex justify-between items-center gap-4">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
                     {getIcon(sensor.icon)}
-                    <span>{sensor.name}</span>
+                    <span className="break-words">{sensor.name}</span>
                   </div>
-                  <span className="font-semibold">{sensor.value}</span>
+                  <span className="font-semibold text-right">{sensor.value}</span>
                 </div>
               ))}
             </div>
@@ -193,10 +193,10 @@ const Dashboard: React.FC = () => {
           
           <MirageCard title="Media Player" {...mirageCardProps}>
             <div className="flex items-center space-x-4">
-              <img src={media.albumArt} alt="Album Art" className="w-20 h-20 rounded-md" />
-              <div className="flex-1">
+              <img src={media.albumArt} alt="Album Art" className="w-20 h-20 rounded-md flex-shrink-0" />
+              <div className="flex-1 min-w-0">
                 <p className="font-bold truncate">{media.title}</p>
-                <p className="text-sm" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{media.artist}</p>
+                <p className="text-sm truncate" style={{ color: 'var(--mirage-card-secondary-text-color)' }}>{media.artist}</p>
                 <div className="flex items-center space-x-4 mt-2">
                   <button><PrevIcon className="w-6 h-6" /></button>
                   <button onClick={togglePlay}>
@@ -212,11 +212,11 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <button onClick={() => toggleScene('movie')} className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${scenes.movie ? 'bg-blue-500/30' : 'bg-white/5 hover:bg-white/10'}`}>
                 <MovieIcon className="w-8 h-8" />
-                <span>Movie Time</span>
+                <span className="break-words text-center">Movie Time</span>
               </button>
                <button onClick={() => toggleScene('goodnight')} className={`p-4 rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${scenes.goodnight ? 'bg-blue-500/30' : 'bg-white/5 hover:bg-white/10'}`}>
                 <BedIcon className="w-8 h-8" />
-                <span>Goodnight</span>
+                <span className="break-words text-center">Goodnight</span>
               </button>
             </div>
           </MirageCard>
@@ -240,10 +240,10 @@ const Dashboard: React.FC = () => {
           <MirageCard title="Users" {...mirageCardProps}>
             <div className="space-y-3">
               {users.map(user => (
-                <div key={user.id} className="flex justify-between items-center">
-                  <div className="flex items-center space-x-3">
-                    <UserIcon className="w-6 h-6" />
-                    <span>{user.name}</span>
+                <div key={user.id} className="flex justify-between items-center gap-4">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <UserIcon className="w-6 h-6 flex-shrink-0" />
+                    <span className="break-words">{user.name}</span>
                   </div>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.status === 'Home' ? 'bg-green-500/20 text-green-300' : 'bg-gray-500/20 text-gray-300'}`}>{user.status}</span>
                 </div>
@@ -253,17 +253,17 @@ const Dashboard: React.FC = () => {
 
           <MirageCard title="Switches" {...mirageCardProps}>
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <CloudRainIcon className="w-6 h-6" />
-                  <span>Sprinkler</span>
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <CloudRainIcon className="w-6 h-6 flex-shrink-0" />
+                  <span className="break-words">Sprinkler</span>
                 </div>
                 <ToggleSwitch isOn={switches.sprinkler} onToggle={() => handleSwitchToggle('sprinkler')} theme={theme} accentColor={accentColor} />
               </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <SparklesIcon className="w-6 h-6" />
-                  <span>Pool Pump</span>
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <SparklesIcon className="w-6 h-6 flex-shrink-0" />
+                  <span className="break-words">Pool Pump</span>
                 </div>
                 <ToggleSwitch isOn={switches.poolPump} onToggle={() => handleSwitchToggle('poolPump')} theme={theme} accentColor={accentColor} />
               </div>
@@ -273,12 +273,12 @@ const Dashboard: React.FC = () => {
           <MirageCard title="System Status" {...mirageCardProps} className="md:col-span-2 lg:col-span-1">
              <div className="space-y-3">
                 {systemStatus.map(sensor => (
-                  <div key={sensor.id} className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
+                  <div key={sensor.id} className="flex justify-between items-center gap-4">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
                       {getIcon(sensor.icon)}
-                      <span>{sensor.name}</span>
+                      <span className="break-words">{sensor.name}</span>
                     </div>
-                    <span className="font-mono text-sm">{sensor.value}</span>
+                    <span className="font-mono text-sm text-right">{sensor.value}</span>
                   </div>
                 ))}
             </div>
@@ -287,12 +287,12 @@ const Dashboard: React.FC = () => {
           <MirageCard title="Network" {...mirageCardProps}>
              <div className="space-y-3">
                 {networkStatus.map(sensor => (
-                  <div key={sensor.id} className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
+                  <div key={sensor.id} className="flex justify-between items-center gap-4">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
                       {getIcon(sensor.icon)}
-                      <span>{sensor.name}</span>
+                      <span className="break-words">{sensor.name}</span>
                     </div>
-                    <span className="font-mono text-sm">{sensor.value}</span>
+                    <span className="font-mono text-sm text-right">{sensor.value}</span>
                   </div>
                 ))}
             </div>
